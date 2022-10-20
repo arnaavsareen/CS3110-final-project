@@ -14,14 +14,14 @@ let rec playgame () =
     \  ";
   ANSITerminal.print_string [ ANSITerminal.magenta ]
     " \n\
-    \       /$$$$$$  /$$$$$$        /$$$$$$$                         \n\
-    \      /$$__  $$/$$__  $$      | $$ __ $$                        \n\
-    \     | $$    _/ $$    _/      | $$    $$ / $$  / $$ /$$$$$$/$$$$\n\
-    \     | $$     |  $$$$$$       | $$$$$$$ | $$ | $$|  $$ _ $$ _ $$\n\
-    \     | $$        ___  $$      | $$ __ $$| $$ | $$|  $$   $$   $$\n\
-    \     | $$    $$/$$   $$       | $$   $$ | $$ | $$|  $$ | $$ | $$\n\
-    \     |  $$$$$$/  $$$$$$/      | $$$$$$$/| $$$$$$ /| $$ | $$ | $$\n\
-    \     |_______/   _____/       |_______/    _____/ |__/ |__/ |__/\n\
+    \     /$$$$$$  /$$$$$$        /$$$$$$$                         \n\
+    \    /$$__  $$/$$__  $$      | $$ __ $$                        \n\
+    \   | $$    _/ $$    _/      | $$    $$ / $$  / $$ /$$$$$$/$$$$\n\
+    \   | $$     |  $$$$$$       | $$$$$$$ | $$ | $$|  $$ _ $$ _ $$\n\
+    \   | $$        ___  $$      | $$ __ $$| $$ | $$|  $$   $$   $$\n\
+    \   | $$    $$/$$   $$       | $$   $$ | $$ | $$|  $$ | $$ | $$\n\
+    \   |  $$$$$$/  $$$$$$/      | $$$$$$$/| $$$$$$ /| $$ | $$ | $$\n\
+    \   |_______/   _____/       |_______/    _____/ |__/ |__/ |__/\n\
     \                                                              \n\
     \                                                              \n\
     \                                                              ";
@@ -52,7 +52,7 @@ let rec playgame () =
             \ > Put simply, the person with th best hand wins. But there is a \
              lot of strategy involved to be good at poker. A well known \
              technique is 'bluffing'.\n\
-             credits: https://www.pokernews.com/poker-rules/texas-holdem.htm")
+             credits: https://www.pokernews.com/poker-rules/texas-holdem.html")
       else if userchoice = "no" then
         ANSITerminal.(
           print_string [ red ] "Quiting the game. See you next time :))")
