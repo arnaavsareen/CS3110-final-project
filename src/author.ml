@@ -1,2 +1,1 @@
-let hours_worked = 100
-let delete = true
+let hours_worked = 20

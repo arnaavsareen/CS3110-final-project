@@ -10,20 +10,7 @@ type suit =
 
 type number =
   | Ace of bool
-  | BadThing
-  | Two
-  | Three
-  | Four
-  | Five
-  | Six
-  | Seven
-  | Eight
-  | Nine
-  | Ten
-  | Eleven
-  | Twelve
-  | Thirteen
-  | Fourteen
+  | Number of int
 
 let ascii_suit = function
   | Spades -> "♠"
@@ -33,20 +20,10 @@ let ascii_suit = function
 
 let str_number = function
   | Ace value -> if value then "1" else "14"
-  (* |Number n -> str_of_int n *)
-  | Two -> "2"
-  | Three -> "3"
-  | Four -> "4"
-  | Five -> "5"
-  | Six -> "6"
-  | Seven -> "7"
-  | Eight -> "8"
-  | Nine -> "9"
-  | Ten -> "10"
-  | Eleven -> "J"
-  | Twelve -> "Q"
-  | Thirteen -> "K"
-  | Fourteen -> "A"
+  | Number 13 -> "Q"
+  | Number 12 -> "K"
+  | Number 11 -> "J"
+  | Number n -> if n >= 2 then string_of_int n else "Not a valid card!"
 
 let hidden_flop0 =
   let card1 = "│\t    ┌─────────┐ ┌─────────┐ ┌─────────┐\t\t\t\t│\n" in
@@ -86,14 +63,13 @@ let flop =
   let card5 = "│\t    │         │ │         │ │         │\t\t\t\t│\n" in
   let card6 = "│\t    │         │ │         │ │         │\t\t\t\t│\n" in
   let card7 = "│\t    └─────────┘ └─────────┘ └─────────┘\t\t\t\t│\n" in
-  print_string (card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7)
-
-let flop =
-  let card1 = "│\t    ┌─────────┐ ┌─────────┐ \t\t\t\t│\n" in
-  let card2 = "│\t    │         │ │         │ \t\t\t\t│\n" in
-  let card3 = "│\t    │         │ │         │ \t\t\t\t│\n" in
-  let card4 = "│\t    │         │ │         │ \t\t\t\t│\n" in
-  let card5 = "│\t    │         │ │         │ \t\t\t\t│\n" in
-  let card6 = "│\t    │         │ │         │ \t\t\t\t│\n" in
-  let card7 = "│\t    └─────────┘ └─────────┘ \t\t\t\t│\n" in
-  print_string (card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7)
+  let card8 = "│\t    ┌─────────┐ ┌─────────┐ \t\t\t\t│\n" in
+  let card9 = "│\t    │         │ │         │ \t\t\t\t│\n" in
+  let card10 = "│\t   │         │ │         │ \t\t\t\t│\n" in
+  let card11 = "│\t   │         │ │         │ \t\t\t\t│\n" in
+  let card12 = "│\t   │         │ │         │ \t\t\t\t│\n" in
+  let card13 = "│\t   │         │ │         │ \t\t\t\t│\n" in
+  let card14 = "│\t   └─────────┘ └─────────┘ \t\t\t\t│\n" in
+  print_string
+    (card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ card8 ^ card9
+   ^ card10 ^ card11 ^ card12 ^ card13 ^ card14)
