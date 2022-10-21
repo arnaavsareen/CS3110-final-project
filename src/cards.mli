@@ -12,10 +12,14 @@ val ascii_suit: suit -> string
 
 val str_number: number -> string 
 
-val hidden_flop0 : unit 
+val deal : string 
 
-val hidden_flop1 : unit 
+val overturn_deal : string 
 
-val hidden_flop2 : unit 
+val hidden_flop0 : string
 
-val flop : unit 
+val hidden_flop1 : string 
+
+val hidden_flop2 : string 
+
+val flop : string

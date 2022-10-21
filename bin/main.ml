@@ -65,19 +65,30 @@ let rec playgame () =
            credits: https://www.pokernews.com/poker-rules/texas-holdem.html \n\n");
 
       ANSITerminal.print_string [ ANSITerminal.magenta ]
-        "\nRequired number of players is atleast 2\n";
+        "\nRequired number of players is atleast 1\n";
       print_string "Enter the names of all players with a space in between\n";
-      print_string "Example: Arnaav Tyler\n";
+      print_string "Example: Arnaav Tyler Ryan Eric\n";
       print_string "> ";
       match read_line () with
       | exception End_of_file -> ()
-      | userchoice ->
+      | userchoice -> (
           let players = String.split_on_char ' ' userchoice in
           let playerlst = List.filter (fun s -> s <> "") players in
           ANSITerminal.print_string [ ANSITerminal.magenta ] "\nWelcome - ";
           print_list playerlst;
           ANSITerminal.print_string [ ANSITerminal.magenta ]
-            "\n\nLet's begin the game!\n"
+            "\n\nLet's begin the game!\n";
+          print_string "You have been dealt two cards: ";
+          print_string "\n";
+          print_string "\n";
+          print_string deal;
+          print_string "\nEnter any key to see your cards!\n";
+          print_string "> ";
+          match read_line () with
+          | exception End_of_file -> ()
+          | userchoice ->
+              print_string "\n";
+              print_string overturn_deal)
     end
   | "no" ->
       ANSITerminal.(
