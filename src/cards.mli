@@ -6,5 +6,16 @@
  type suit = Hearts | Spades | Diamonds | Clubs
  
 (* [number] is the rank of a card.*)
-type number =Ace of bool | Number of int
+type number = Ace of bool | Number of int
 
+val ascii_suit: suit -> string 
+
+val str_number: number -> string 
+
+val hidden_flop0 : unit 
+
+val hidden_flop1 : unit 
+
+val hidden_flop2 : unit 
+
+val flop : unit 
