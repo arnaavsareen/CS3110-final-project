@@ -18,10 +18,10 @@ type card = {
   number : number;
 }
 
-let suit_list = [ Hearts; Spades; Diamonds; Clubs ]
+let suit_arr = [| Hearts; Spades; Diamonds; Clubs |]
 
-let number_list =
-  [
+let number_arr =
+  [|
     Number 1;
     Number 2;
     Number 3;
@@ -36,7 +36,7 @@ let number_list =
     Number 12;
     Number 13;
     Number 14;
-  ]
+  |]
 
 let ascii_suit = function
   | Spades -> "♠"
@@ -51,11 +51,7 @@ let str_number = function
   | Number 11 -> "J"
   | Number n -> if n >= 2 then string_of_int n else "Not a valid card!"
 
-let rec shuffle = function
-  | [ h ] -> h
-  | h ->
-      let x = List.length h - 1 |> Random.int |> List.nth h in
-      shuffle (List.filter (fun y -> y <> x) h)
+let shuffle arr = arr.(Random.int (Array.length arr))
 
 let deal =
   let card1 = "      ┌─────────┐ ┌─────────┐         \n" in
@@ -68,10 +64,10 @@ let deal =
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
 let overturn_deal =
-  let num1 = str_number (shuffle number_list) in
-  let suit1 = ascii_suit (shuffle suit_list) in
-  let num2 = str_number (shuffle number_list) in
-  let suit2 = ascii_suit (shuffle suit_list) in
+  let num1 = str_number (shuffle number_arr) in
+  let suit1 = ascii_suit (shuffle suit_arr) in
+  let num2 = str_number (shuffle number_arr) in
+  let suit2 = ascii_suit (shuffle suit_arr) in
   let card1 = "      ┌─────────┐ ┌─────────┐         \n" in
   let card2 =
     "      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │         \n"

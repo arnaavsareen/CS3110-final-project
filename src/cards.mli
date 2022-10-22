@@ -14,15 +14,15 @@ type card = {
   number : number;
 }
 
-val suit_list: suit list
+val suit_arr: suit array
 
-val number_list: number list
+val number_arr: number array
 
 val ascii_suit: suit -> string 
 
 val str_number: number -> string 
 
-val shuffle: 'a list -> 'a
+val shuffle: 'a array -> 'a
 
 val deal : string 
 
