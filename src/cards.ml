@@ -49,7 +49,7 @@ let str_number = function
   | Number 13 -> "Q"
   | Number 12 -> "K"
   | Number 11 -> "J"
-  | Number n -> if n >= 2 then string_of_int n else "Not a valid card!"
+  | Number n -> string_of_int n
 
 let shuffle arr =
   Random.self_init ();

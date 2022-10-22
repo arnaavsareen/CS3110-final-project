@@ -81,15 +81,22 @@ let rec playgame () =
             "\n\nLet's begin the game!\n";
           print_string "You have been dealt two cards: ";
           print_string "\n";
-          print_string "\n";
           print_string deal;
           print_string "\nEnter any key to see your cards!\n";
           print_string "> ";
           match read_line () with
           | exception End_of_file -> ()
-          | userchoice ->
+          | userchoice -> (
               print_string "\n";
-              print_string overturn_deal)
+              print_string overturn_deal;
+              print_string "\nEnter any key to see overturn your cards!\n";
+              print_string "> ";
+              match read_line () with
+              | exception End_of_file -> ()
+              | userchoice ->
+                  print_string "\n";
+                  print_string deal;
+                  print_string "\n"))
     end
   | "no" ->
       ANSITerminal.(
