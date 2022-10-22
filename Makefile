@@ -23,7 +23,6 @@ zip:
 
 clean:
 	dune clean
-	rm -f finalproject.zip
 
 doc:
 	dune build @doc
