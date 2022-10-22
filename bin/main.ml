@@ -42,6 +42,7 @@ let rec playgame () =
      Ryan Noonan\n";
   ANSITerminal.print_string [ ANSITerminal.magenta ]
     "\n\nAre you ready to play some poker today? (yes/no)\n";
+  print_string "Note: No space after yes or no\n";
   print_string "> ";
   match read_line () with
   | exception End_of_file -> ()
