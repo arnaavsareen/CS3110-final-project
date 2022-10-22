@@ -5,7 +5,7 @@ Make sure you have Ocaml installed, if not this link
 out. <br>
 We need to install a package and to do that run - <br>
 opam update <br>
-opam ugrade <br>
+opam upgrade <br>
 opam install ANSITerminal <br>
 
 Once you have installed OCaml, the required packages, and downloaded the project 
