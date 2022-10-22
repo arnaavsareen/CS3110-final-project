@@ -51,7 +51,9 @@ let str_number = function
   | Number 11 -> "J"
   | Number n -> if n >= 2 then string_of_int n else "Not a valid card!"
 
-let shuffle arr = arr.(Random.int (Array.length arr))
+let shuffle arr =
+  Random.self_init ();
+  Array.get arr (Random.int (Array.length arr))
 
 let deal =
   let card1 = "      ┌─────────┐ ┌─────────┐         \n" in
