@@ -83,7 +83,7 @@ let overturn_deal =
   let card7 = "      └─────────┘ └─────────┘         \n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
-let hidden_flop0 =
+let hidden_flop0_str =
   let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐        │\n" in
   let card2 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│        │\n" in
   let card3 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│        │\n" in
@@ -93,7 +93,7 @@ let hidden_flop0 =
   let card7 = "│      └─────────┘ └─────────┘ └─────────┘        │\n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
-let hidden_flop1 =
+let hidden_flop1_str =
   let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐        │\n" in
   let card2 = "│      │         │ │░░░░░░░░░│ │░░░░░░░░░│        │\n" in
   let card3 = "│      │         │ │░░░░░░░░░│ │░░░░░░░░░│        │\n" in
@@ -103,7 +103,7 @@ let hidden_flop1 =
   let card7 = "│      └─────────┘ └─────────┘ └─────────┘        │\n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
-let hidden_flop2 =
+let hidden_flop2_str =
   let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐        │\n" in
   let card2 = "│      │         │ │         │ │░░░░░░░░░│        │\n" in
   let card3 = "│      │         │ │         │ │░░░░░░░░░│        │\n" in
@@ -113,7 +113,7 @@ let hidden_flop2 =
   let card7 = "│      └─────────┘ └─────────┘ └─────────┘        │\n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
-let hidden_flop3 =
+let hidden_flop3_str =
   let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐        │\n" in
   let card2 = "│      │         │ │         │ │         │        │\n" in
   let card3 = "│      │         │ │         │ │         │        │\n" in
@@ -123,7 +123,7 @@ let hidden_flop3 =
   let card7 = "│      └─────────┘ └─────────┘ └─────────┘        │\n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
-let flop =
+let flop_str =
   let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐        │\n" in
   let card2 = "│      │         │ │         │ │         │        │\n" in
   let card3 = "│      │         │ │         │ │         │        │\n" in
@@ -140,3 +140,19 @@ let flop =
   let card14 = "│     └─────────┘ └─────────┘                    │\n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ card8 ^ card9 ^ card10
   ^ card11 ^ card12 ^ card13 ^ card14
+
+module Hand = struct
+  type t =
+    | Royal_Flush
+    | Straight_Flush of card
+    | Four_of_a_kind of card * card
+    | Full_house of card * card
+    | Flush of card * card * card * card * card
+    | Straight of card
+    | Three_of_a_kind of card * card * card
+    | Two_pairs of card * card * card * card
+    | Pair of card * card * card * card * card
+    | High_card of card * card * card * card * card
+
+  let compare t1 t2 = 0
+end
