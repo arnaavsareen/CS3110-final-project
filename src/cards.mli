@@ -1,10 +1,16 @@
 (* [color] is the color of the card. It can be Red or Black. *)
-type color = Red | Black
+type color =
+  | Red
+  | Black
 
-(* [suit] is the type of a card suit. It can be Hearts, Spades, Diamonds, 
-  Clubs *)
-type suit = Hearts | Spades | Diamonds | Clubs
- 
+(* [suit] is the type of a card suit. It can be Hearts, Spades, Diamonds,
+   Clubs *)
+type suit =
+  | Hearts
+  | Spades
+  | Diamonds
+  | Clubs
+
 (* [number] is the rank of a card.*)
 type number = Number of int
 
@@ -14,24 +20,23 @@ type card = {
   number : number;
 }
 
-val suit_arr: suit array
+val suit_arr : suit array
+val number_arr : number array
+val ascii_suit : suit -> string
+val str_number : number -> string
+val shuffle : 'a array -> 'a
+val deal : string
+val overturn_deal : string
+val hidden_flop0_str : string
+val hidden_flop1_str : string
+val hidden_flop2_str : string
+val flop_str : string
 
-val number_arr: number array
+module Hand : sig
+  (*The type of the hand is one of the poker hands*)
+  type t
 
-val ascii_suit: suit -> string 
-
-val str_number: number -> string 
-
-val shuffle: 'a array -> 'a
-
-val deal : string 
-
-val overturn_deal : string 
-
-val hidden_flop0 : string
-
-val hidden_flop1 : string 
-
-val hidden_flop2 : string 
-
-val flop : string
+  (*compare h1 h2 returns -1 if h1 is a worse hand than h2, 0 if the hands are
+    equal (very rare) and 1 if h1 is a better hand than h2*)
+  val compare : t -> t -> int
+end
