@@ -143,16 +143,38 @@ let flop_str =
 
 module Hand = struct
   type t =
-    | Royal_Flush
-    | Straight_Flush of card
-    | Four_of_a_kind of card * card
-    | Full_house of card * card
-    | Flush of card * card * card * card * card
-    | Straight of card
-    | Three_of_a_kind of card * card * card
+    (*Many of these types can be represented by a t-uple of cards where t is
+      less than 5*)
+    | Royal_Flush (*Royal flush always wins, unless it is dealt by the flop*)
+    | Straight_Flush of card (*highest card*)
+    | Four_of_a_kind of card * card (*four single*)
+    | Full_house of card * card (*triple double*)
+    | Flush of card * card * card * card * card (*descending value*)
+    | Straight of card (*highest card*)
+    | Three_of_a_kind of card * card * card (**)
     | Two_pairs of card * card * card * card
     | Pair of card * card * card * card * card
     | High_card of card * card * card * card * card
 
-  let compare t1 t2 = 0
+  let init_hand (cards : card list) = Royal_Flush
+
+  (*Compare n tuples is a comparison function between tuples of cards, where a
+    tuple is greater than another if the first card value in the tuple is
+    greater, if the first values are the same you compare the second values, and
+    so on.*)
+
+  let compare t1 t2 =
+    match (t1, t2) with
+    | Royal_Flush, Royal_Flush -> 0
+    | Straight_Flush c, Straight_Flush b -> 0
+    | Four_of_a_kind (c1, c2), Four_of_a_kind (b1, b2) ->
+        Stdlib.compare (c1, c2) (b1, b2)
+    | Full_house (c1, c2), Full_house (b1, b2) -> 0
+    | Flush (c1, c2, c3, c4, c5), Flush (b1, b2, b3, b4, b5) -> 0
+    | Straight c1, Straight c2 -> 0
+    | Three_of_a_kind (c1, c2, c3), Three_of_a_kind (b1, b2, b3) -> 0
+    | Two_pairs (c1, c2, c3, c4), Two_pairs (b1, b2, b3, b4) -> 0
+    | Pair (c1, c2, c3, c4, c5), Pair (b1, b2, b3, b4, b5) -> 0
+    | High_card (c1, c2, c3, c4, c5), High_card (b1, b2, b3, b4, b5) -> 0
+    | _, _ -> 0
 end
