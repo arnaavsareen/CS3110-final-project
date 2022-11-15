@@ -4,6 +4,7 @@ type color =
   | Red
   | Black
 
+(* Hi I am here.*)
 type suit =
   | Hearts
   | Spades
