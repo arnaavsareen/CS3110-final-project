@@ -6,6 +6,7 @@ type color =
 
 (* Hi I am here.*)
 (*another thing is here*)
+(*A third thing has appeared!*)
 type suit =
   | Hearts
   | Spades
