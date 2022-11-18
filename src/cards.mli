@@ -37,7 +37,8 @@ module Hand : sig
     cards that can be compared to others along usual poker rules*)
   type t
 
-  (*Takes a list of 5 cards as input, and returns a hand type of those cards*)
+  (*Takes a list of 7 cards as input, and returns a hand type of the best hand
+    among those 7 cards*)
   val init_hand : card list -> t
 
   (*compare h1 h2 returns -1 if h1 is a worse hand than h2, 0 if the hands are
