@@ -37,6 +37,14 @@ module Hand : sig
     cards that can be compared to others along usual poker rules*)
   type t
 
+  (*Takes a list of 7 cards, and ordered them first according to multiplicity
+    (How often they occur in the list) then by value. Returns an association
+    list where every distinct card value is matched to it's multiplicity. For
+    example : ordered_card_mult [king, ace, ace, four, four, seven, jack]
+    returns [(2,ace);(2,four);(1,king);(1,jack);(1,seven)] Note: in this
+    function we don't care about the suits of the cards*)
+  val ordered_cards_mult : card list -> (number * int) list
+
   (*Takes a list of 7 cards as input, and returns a hand type of the best hand
     among those 7 cards*)
   val init_hand : card list -> t
