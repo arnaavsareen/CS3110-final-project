@@ -30,10 +30,15 @@ type game_stage =
 (* Game_state represesnts the state of the game, containing the stage, the
    players, *)
 type game_state = {
-  stage : game_stage;
-  players : player list;
-  pots : pot;
+  mutable stage : game_stage;
+  mutable players : player list;
+  mutable pot : pot;
+  mutable deck : card list;
+  mutable community_cards : card list;
+  mutable current_bet : int;
 }
+
+val init_state : game_state
 
 type deck = card list
 type turn_order = player list

@@ -13,6 +13,7 @@ type pot = {
 }
 
 type game_stage =
+  | Begin
   | First_Bet of int
   | Flop
   | Second_Bet of int
@@ -25,10 +26,23 @@ type game_stage =
 (* Game_state represesnts the state of the game, containing the stage, the
    players, *)
 type game_state = {
-  stage : game_stage;
-  players : player list;
-  pot : pot;
+  mutable stage : game_stage;
+  mutable players : player list;
+  mutable pot : pot;
+  mutable deck : card list;
+  mutable community_cards : card list;
+  mutable current_bet : int;
 }
+
+let init_state =
+  {
+    stage = Begin;
+    players = [];
+    pot = { amount = 0; side_pots = [] };
+    deck = [];
+    community_cards = [];
+    current_bet = 0;
+  }
 
 let string_of_player p =
   "Name = " ^ p.name ^ "Hand = hand " ^ "Money = " ^ string_of_int p.money
