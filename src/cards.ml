@@ -18,6 +18,8 @@ type card = {
   number : number;
 }
 
+type deck = card list
+
 let suit_arr = [| Hearts; Spades; Diamonds; Clubs |]
 
 let number_arr =
@@ -37,6 +39,26 @@ let number_arr =
     Number 13;
     Number 14;
   |]
+
+let rec make_fresh x y deck =
+  if x > 3 then deck
+  else if y > 13 then make_fresh (x + 1) 0 deck
+  else
+    make_fresh x (y + 1)
+      ({ color = Red; suit = suit_arr.(x); number = number_arr.(y) } :: deck)
+
+let shuffler d =
+  let nd = List.map (fun c -> (Random.bits (), c)) d in
+  let sond = List.sort compare nd in
+  List.map snd sond
+
+let rec draw_helper x deck hand =
+  match deck with
+  | [] -> (deck, hand)
+  | h :: t -> if x = 0 then (deck, hand) else draw_helper (x - 1) t (h :: hand)
+
+let draw x deck = draw_helper x deck []
+let fresh_deck = shuffler (make_fresh 0 0 [])
 
 let ascii_suit = function
   | Spades -> "♠"

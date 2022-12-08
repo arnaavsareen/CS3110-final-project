@@ -12,14 +12,25 @@ type suit =
   | Clubs
 
 (* [number] is the rank of a card.*)
-type number = Number of int
+type number =
+  | Number of int
+      (**Card is a representation of a single card within a 52 card deck*)
 
 type card = {
   color : color;
   suit : suit;
   number : number;
 }
-(**Card is a representation of a single card within a 52 card deck*)
+
+(*Deck is a represntation of a deck of cards*)
+type deck = card list
+
+(*shuffles a deck of cards*)
+val shuffler : deck -> deck
+
+(*Draws the top x cards, and crates a tuple (x,y), where x is the deck with top
+  x cards removed and y is the drawn cards*)
+val draw : int -> deck -> deck * deck
 
 val suit_arr : suit array
 (**suit and number array are used in constructing new cards and pattern matching*)
