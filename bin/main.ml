@@ -60,7 +60,7 @@ let rec playgame () =
           \ > These face-up cards are called the 'community cards.' Each \
            player is free to use the community cards in combination with their \
            hole cards to build a five-card poker hand.\n\
-          \ > Put simply, the person with thes best hand wins. But there is a \
+          \ > Put simply, the person with the best hand wins. But there is a \
            lot of strategy involved to be good at poker. A well known \
            technique is 'bluffing'.\n\
            credits: https://www.pokernews.com/poker-rules/texas-holdem.html \n\n");
@@ -89,14 +89,32 @@ let rec playgame () =
           | userchoice -> (
               print_string "\n";
               print_string overturn_deal;
-              print_string "\nEnter any key to see overturn your cards!\n";
+              print_string "\nEnter any key to overturn your cards!\n";
               print_string "> ";
               match read_line () with
               | exception End_of_file -> ()
-              | userchoice ->
+              | userchoice -> (
                   print_string "\n";
                   print_string deal;
-                  print_string "\n"))
+                  print_string "\n";
+                  print_string "The flop is has been dealt.\n";
+                  print_string "\n";
+                  print_string hidden_flop0_str;
+                  print_string "\n";
+                  print_string "Enter any key to overturn your cards!\n";
+                  print_string "> ";
+                  match read_line () with
+                  | exception End_of_file -> ()
+                  | userchoice ->
+                      print_string "\n";
+                      print_string hidden_flop1_str;
+                      print_string "\n";
+                      print_string hidden_flop2_str;
+                      print_string "\n";
+                      print_string hidden_flop3_str;
+                      print_string "\n";
+                      print_string flop_str;
+                      print_string "\n")))
     end
   | "no" ->
       ANSITerminal.(
