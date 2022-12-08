@@ -1,11 +1,38 @@
 (*Game.ml defines functions that manages the game state and players*)
 open Cards
 
+(*player represents the player*)
 type player = {
   name : string;
   hand : card list;
   money : int;
   bet : int;
+}
+
+(*pot represents the main pot with amount and side pot in side_pots*)
+type pot = {
+  amount : int;
+  side_pots : int list;
+}
+
+(*Game_stage represnts the current stage of the game. Bet of int represents
+  which player is betting right now.*)
+type game_stage =
+  | First_Bet of int
+  | Flop
+  | Second_Bet of int
+  | Turn
+  | Third_Bet of int
+  | River
+  | Final_bet of int
+  | Finish
+
+(* Game_state represesnts the state of the game, containing the stage, the
+   players, *)
+type game_state = {
+  stage : game_stage;
+  players : player list;
+  pots : pot;
 }
 
 type deck = card list
