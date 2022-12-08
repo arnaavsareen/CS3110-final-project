@@ -52,4 +52,8 @@ module Hand : sig
   (*compare h1 h2 returns -1 if h1 is a worse hand than h2, 0 if the hands are
     equal (very rare) and 1 if h1 is a better hand than h2*)
   val compare : t -> t -> int
+
+  (*Returns a string representation of the hand, with the type followed by the
+    value of the cards representing that type*)
+  val to_string : t -> string
 end

@@ -192,10 +192,14 @@ module Hand = struct
     (* for i = 0 to List.length cards do if fst (List.nth cards i) =
        number_minus_one (fst (List.nth cards (i-1))) then count := !count + 1;
        if !count = 5 then true else count := 1 ; *)
-    let i = 0 in
-    while i < List.length cards - 2 && !boolean = false do
+
+    let i = ref 0 in
+    while !i < List.length cards - 2 && !boolean = false do
+      i := !i + 1;
       if
-        fst (List.nth cards i) = number_minus_one (fst (List.nth cards (i + 1)))
+        fst (List.nth cards !i)
+        = number_minus_one (fst (List.nth cards (!i + 1)))
+
       then count := !count + 1;
       if !count = 5 then boolean := true
     done;
@@ -219,8 +223,21 @@ module Hand = struct
     then true
     else false
 
+
+  let is_flush2 cards =
+    let hearts = List.filter (fun c -> c.suit = Hearts) cards in
+    let clubs = List.filter (fun c -> c.suit = Clubs) cards in
+    let diamonds = List.filter (fun c -> c.suit = Diamonds) cards in
+    let spades = List.filter (fun c -> c.suit = Spades) cards in
+    if List.length hearts >= 5 then (true, hearts)
+    else if List.length clubs >= 5 then (true, clubs)
+    else if List.length diamonds >= 5 then (true, diamonds)
+    else if List.length spades >= 5 then (true, spades)
+    else (false, spades)
+
   let init_hand (cards : card list) =
-    let is_flush = is_flush cards in
+    let is_flush, flush = is_flush2 cards in
+
     let ordered_cards = ordered_cards_mult cards in
     let is_straight = is_straight ordered_cards in
     (*Straight flush / royal flush case*)
@@ -238,6 +255,16 @@ module Hand = struct
       match (m1, m2) with
       | 4, _ -> Four_of_a_kind (n1, n2)
       | 3, i when i >= 2 -> Full_house (n1, n2)
+
+      | _ when is_flush ->
+          let flush_ordered = ordered_cards_mult flush in
+          Flush
+            ( fst (List.hd flush_ordered),
+              fst (List.nth flush_ordered 1),
+              fst (List.nth flush_ordered 2),
+              fst (List.nth flush_ordered 3),
+              fst (List.nth flush_ordered 4) )
+
       | 3, _ -> Three_of_a_kind (n1, n2, fst (List.nth ordered_cards 2))
       | 2, 2 -> Two_pairs (n1, n2, fst (List.nth ordered_cards 2))
       | 2, _ ->
@@ -261,17 +288,64 @@ module Hand = struct
     so on.*)
 
   let compare t1 t2 =
+    let rank t =
+      match t with
+      | Royal_Flush -> 10
+      | Straight_Flush _ -> 9
+      | Four_of_a_kind _ -> 8
+      | Full_house _ -> 7
+      | Flush _ -> 6
+      | Straight _ -> 5
+      | Three_of_a_kind _ -> 4
+      | Two_pairs _ -> 3
+      | Pair _ -> 2
+      | High_card _ -> 1
+    in
+
     match (t1, t2) with
     | Royal_Flush, Royal_Flush -> 0
-    | Straight_Flush c, Straight_Flush b -> 0
+    | Straight_Flush c, Straight_Flush b -> compare c b
     | Four_of_a_kind (c1, c2), Four_of_a_kind (b1, b2) ->
-        Stdlib.compare (c1, c2) (b1, b2)
-    | Full_house (c1, c2), Full_house (b1, b2) -> 0
-    | Flush (c1, c2, c3, c4, c5), Flush (b1, b2, b3, b4, b5) -> 0
-    | Straight c1, Straight c2 -> 0
-    | Three_of_a_kind (c1, c2, c3), Three_of_a_kind (b1, b2, b3) -> 0
-    | Two_pairs (c1, c2, c3), Two_pairs (b1, b2, b3) -> 0
-    | Pair (c1, c2, c3, c4), Pair (b1, b2, b3, b4) -> 0
-    | High_card (c1, c2, c3, c4, c5), High_card (b1, b2, b3, b4, b5) -> 0
-    | _, _ -> 0
+
+        compare (c1, c2) (b1, b2)
+    | Full_house (c1, c2), Full_house (b1, b2) -> compare (c1, c2) (b1, b2)
+    | Flush (c1, c2, c3, c4, c5), Flush (b1, b2, b3, b4, b5) ->
+        compare (c1, c2, c3, c4, c5) (b1, b2, b3, b4, b5)
+    | Straight c1, Straight c2 -> compare c1 c2
+    | Three_of_a_kind (c1, c2, c3), Three_of_a_kind (b1, b2, b3) ->
+        compare (c1, c2, c3) (b1, b2, b3)
+    | Two_pairs (c1, c2, c3), Two_pairs (b1, b2, b3) ->
+        compare (c1, c2, c3) (b1, b2, b3)
+    | Pair (c1, c2, c3, c4), Pair (b1, b2, b3, b4) ->
+        compare (c1, c2, c3, c4) (b1, b2, b3, b4)
+    | High_card (c1, c2, c3, c4, c5), High_card (b1, b2, b3, b4, b5) ->
+        compare (c1, c2, c3, c4, c5) (b1, b2, b3, b4, b5)
+    | _ -> compare (rank t1) (rank t2)
+
+  let to_string t =
+    match t with
+    | Royal_Flush -> "Royal Flush"
+    | Straight_Flush (Number n) -> "Straight Flush " ^ string_of_int n
+    | Four_of_a_kind (Number n, Number n2) ->
+        "Four_of_a_kind " ^ string_of_int n ^ ", " ^ string_of_int n2
+    | Full_house (Number n, Number n2) ->
+        "Full_House " ^ string_of_int n ^ ", " ^ string_of_int n2
+    | Flush (Number n1, Number n2, Number n3, Number n4, Number n5) ->
+        "Flush " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        ^ string_of_int n3 ^ ", " ^ string_of_int n4 ^ ", " ^ string_of_int n5
+    | Straight (Number n1) -> "Straight " ^ string_of_int n1
+    | Two_pairs (Number n1, Number n2, Number n3) ->
+        "Two_pairs " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        ^ string_of_int n3
+    | Pair (Number n1, Number n2, Number n3, Number n4) ->
+        "Pair " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        ^ string_of_int n3 ^ ", " ^ string_of_int n4
+    | High_card (Number n1, Number n2, Number n3, Number n4, Number n5) ->
+        "High_card " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        ^ string_of_int n3 ^ ", " ^ string_of_int n4 ^ ", " ^ string_of_int n5
+        ^ ", "
+    | Three_of_a_kind (Number n1, Number n2, Number n3) ->
+        "Flush " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        ^ string_of_int n3
+
 end

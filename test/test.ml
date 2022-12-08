@@ -43,7 +43,11 @@ let ordered_card_mult_test name card_list expected_output =
     ~printer:(list_to_string number_int_pair_to_string)
 
 let init_hand_test name cards expected_output =
-  name >:: fun _ -> assert_equal expected_output (Hand.init_hand cards)
+  name >:: fun _ ->
+  assert_equal expected_output
+    (Hand.to_string (Hand.init_hand cards))
+    ~printer:(fun x -> x)
+
 
 let tests =
   "test suite for cards.ml"
@@ -67,9 +71,12 @@ let tests =
          ( "test card list to string" >:: fun _ ->
            assert_equal "[7 of Hearts; 13 of Clubs; ]"
              (list_to_string card_to_string [ sevenH; kC ])
-             ~printer:(fun x -> x) )
-         (* (init_hand_test "four of a kind" [ aC; aH; kC; aC; aH; sevenH; fourH
-            ] (Four_of_a_kind (Number 14, Number 13)) *);
+
+             ~printer:(fun x -> x) );
+         init_hand_test "four of a kind"
+           [ aC; aH; kC; aC; aH; sevenH; fourH ]
+           "Four_of_a_kind 14, 13";
+
        ]
 
 let _ = run_test_tt_main tests
