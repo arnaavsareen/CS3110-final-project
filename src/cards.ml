@@ -192,12 +192,14 @@ module Hand = struct
     (* for i = 0 to List.length cards do if fst (List.nth cards i) =
        number_minus_one (fst (List.nth cards (i-1))) then count := !count + 1;
        if !count = 5 then true else count := 1 ; *)
+
     let i = ref 0 in
     while !i < List.length cards - 2 && !boolean = false do
       i := !i + 1;
       if
         fst (List.nth cards !i)
         = number_minus_one (fst (List.nth cards (!i + 1)))
+
       then count := !count + 1;
       if !count = 5 then boolean := true
     done;
@@ -221,6 +223,7 @@ module Hand = struct
     then true
     else false
 
+
   let is_flush2 cards =
     let hearts = List.filter (fun c -> c.suit = Hearts) cards in
     let clubs = List.filter (fun c -> c.suit = Clubs) cards in
@@ -234,6 +237,7 @@ module Hand = struct
 
   let init_hand (cards : card list) =
     let is_flush, flush = is_flush2 cards in
+
     let ordered_cards = ordered_cards_mult cards in
     let is_straight = is_straight ordered_cards in
     (*Straight flush / royal flush case*)
@@ -251,6 +255,7 @@ module Hand = struct
       match (m1, m2) with
       | 4, _ -> Four_of_a_kind (n1, n2)
       | 3, i when i >= 2 -> Full_house (n1, n2)
+
       | _ when is_flush ->
           let flush_ordered = ordered_cards_mult flush in
           Flush
@@ -259,6 +264,7 @@ module Hand = struct
               fst (List.nth flush_ordered 2),
               fst (List.nth flush_ordered 3),
               fst (List.nth flush_ordered 4) )
+
       | 3, _ -> Three_of_a_kind (n1, n2, fst (List.nth ordered_cards 2))
       | 2, 2 -> Two_pairs (n1, n2, fst (List.nth ordered_cards 2))
       | 2, _ ->
@@ -300,6 +306,7 @@ module Hand = struct
     | Royal_Flush, Royal_Flush -> 0
     | Straight_Flush c, Straight_Flush b -> compare c b
     | Four_of_a_kind (c1, c2), Four_of_a_kind (b1, b2) ->
+
         compare (c1, c2) (b1, b2)
     | Full_house (c1, c2), Full_house (b1, b2) -> compare (c1, c2) (b1, b2)
     | Flush (c1, c2, c3, c4, c5), Flush (b1, b2, b3, b4, b5) ->
@@ -340,4 +347,5 @@ module Hand = struct
     | Three_of_a_kind (Number n1, Number n2, Number n3) ->
         "Flush " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3
+
 end
