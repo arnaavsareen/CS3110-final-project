@@ -92,3 +92,5 @@ let rec main_pot_amount plist =
   match plist with
   | [] -> 0
   | h :: t -> h.bet + main_pot_amount t
+
+(*testing*)
