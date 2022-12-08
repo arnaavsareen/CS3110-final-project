@@ -32,7 +32,7 @@ type game_stage =
 type game_state = {
   stage : game_stage;
   players : player list;
-  pots : pot;
+  pot : pot;
 }
 
 type deck = card list
