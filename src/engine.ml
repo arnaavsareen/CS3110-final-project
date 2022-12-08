@@ -12,6 +12,24 @@ type pot = {
   side_pots : int list;
 }
 
+type game_stage =
+  | First_Bet of int
+  | Flop
+  | Second_Bet of int
+  | Turn
+  | Third_Bet of int
+  | River
+  | Final_bet of int
+  | Finish
+
+(* Game_state represesnts the state of the game, containing the stage, the
+   players, *)
+type game_state = {
+  stage : game_stage;
+  players : player list;
+  pot : pot;
+}
+
 let string_of_player p =
   "Name = " ^ p.name ^ "Hand = hand " ^ "Money = " ^ string_of_int p.money
   ^ " Bet = " ^ string_of_int p.money
