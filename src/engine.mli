@@ -18,6 +18,7 @@ type pot = {
 (*Game_stage represnts the current stage of the game. Bet of int represents
   which player is betting right now.*)
 type game_stage =
+  | Begin
   | First_Bet of int
   | Flop
   | Second_Bet of int
