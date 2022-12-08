@@ -18,6 +18,9 @@ val make_bet : player -> turn_order -> int -> player
 val call_amount : player -> turn_order -> int
 val is_side_pot : turn_order -> bool
 val all_in : player -> bool
+(*retruns a list of the vaious bet amounts of each sidepot ordered from lowest
+  to highest*)
+
 val side_pot_amount : turn_order -> int list
 val side_pot_list : turn_order -> int list
 val fix_values : int list -> int list
