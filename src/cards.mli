@@ -19,15 +19,29 @@ type card = {
   suit : suit;
   number : number;
 }
+(**Card is a representation of a single card within a 52 card deck*)
 
 val suit_arr : suit array
+(**suit and number array are used in constructing new cards and pattern matching*)
+
 val number_arr : number array
+
+(*Given a card, returns the suit of it in string form*)
 val ascii_suit : suit -> string
+
+(*given a card, returns the numbe rof it as a string**)
 val str_number : number -> string
+
 val shuffle : 'a array -> 'a
+(**shuffles a deck of cards, given an array of cards*)
+
 val deal : string
 val overturn_deal : string
+
 val hidden_flop0_str : string
+(**Hidden flop are variables representing the ascii visual of the cards within
+   the console*)
+
 val hidden_flop1_str : string
 val hidden_flop2_str : string
 val hidden_flop3_str : string
