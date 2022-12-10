@@ -82,9 +82,12 @@ let increment status =
       ()
   | _ -> raise Impossible
 
-let fold status = status.folded = true
-let raise status amount = ()
-let check status = ()
+let fold status player_num = ()
+let raise status player_num amount = ()
+let check status player_num = ()
+let deal status cards = ()
+let flop status cards = ()
+let cleanup status bool = ()
 
 let string_of_player p =
   "Name = " ^ p.name ^ "Hand = hand " ^ "Money = " ^ string_of_int p.money

@@ -79,12 +79,44 @@ let fix_value_test name list_int expected_output =
       "fix value error")
 
 let tyler =
-  { name = "tyler"; hand = [ fourC; sevenH ]; money = 1000; bet = 100 }
+  {
+    name = "tyler";
+    hand = [ fourC; sevenH ];
+    money = 1000;
+    bet = 100;
+    folded = false;
+  }
 
-let arnaav = { name = "arnaav"; hand = [ aH; aC ]; money = 0; bet = 90 }
-let ryan = { name = "ryan"; hand = [ sevenH; sevenH ]; money = 690; bet = 420 }
-let eric = { name = "eric"; hand = [ kC; fourH ]; money = 100; bet = 200 }
-let big_man = { name = "big man"; hand = [ kC; fourH ]; money = 0; bet = 100 }
+let arnaav =
+  { name = "arnaav"; hand = [ aH; aC ]; money = 0; bet = 90; folded = false }
+
+let ryan =
+  {
+    name = "ryan";
+    hand = [ sevenH; sevenH ];
+    money = 690;
+    bet = 420;
+    folded = false;
+  }
+
+let eric =
+  {
+    name = "eric";
+    hand = [ kC; fourH ];
+    money = 100;
+    bet = 200;
+    folded = false;
+  }
+
+let big_man =
+  {
+    name = "big man";
+    hand = [ kC; fourH ];
+    money = 0;
+    bet = 100;
+    folded = false;
+  }
+
 let plist = [ tyler; arnaav; ryan; eric ]
 let plist1 = [ tyler; big_man; arnaav; ryan; eric ]
 let test_list = [ 90; 100 ]
@@ -121,7 +153,13 @@ let tests =
          make_bet_test "testing bet over money" tyler plist 1100 tyler;
          make_bet_test "testing bet below top bet" tyler plist 100 tyler;
          make_bet_test "testing valid bet" tyler plist 320
-           { name = "tyler"; hand = [ fourC; sevenH ]; money = 680; bet = 420 };
+           {
+             name = "tyler";
+             hand = [ fourC; sevenH ];
+             money = 680;
+             bet = 420;
+             folded = false;
+           };
          is_side_pot_test "testing side pot  amount" plist true;
          fix_value_test "testing fix values" test_list [ 90; 10 ];
          side_pot_list_test "testing side pot" plist [ 90 ];
