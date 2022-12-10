@@ -65,7 +65,7 @@ let rec tick () =
   | Turn -> raise (Unimplemented "no")
   | Third_Bet x -> raise (Unimplemented "no")
   | River -> raise (Unimplemented "no")
-  | Final_bet x -> raise (Unimplemented "no")
+  | Final_Bet x -> raise (Unimplemented "no")
   | Finish -> raise (Unimplemented "no")
 
 let rec playgame () =
