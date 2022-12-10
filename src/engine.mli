@@ -7,6 +7,7 @@ type player = {
   hand : card list;
   money : int;
   bet : int;
+  folded : bool;
 }
 
 (*pot represents the main pot with amount and side pot in side_pots*)
@@ -14,6 +15,10 @@ type pot = {
   amount : int;
   side_pots : int list;
 }
+
+(*Type options represents the various options one may select at the begining of
+  the game*)
+type options = { starting_money : int }
 
 (*Game_stage represnts the current stage of the game. Bet of int represents
   which player is betting right now.*)
@@ -25,7 +30,7 @@ type game_stage =
   | Turn
   | Third_Bet of int
   | River
-  | Final_bet of int
+  | Final_Bet of int
   | Finish
 
 (* Game_state represesnts the state of the game, containing the stage, the
@@ -37,13 +42,30 @@ type game_state = {
   mutable deck : card list;
   mutable community_cards : card list;
   mutable current_bet : int;
+  mutable options : options;
 }
 
-val init_state : game_state
-
-type deck = card list
 type turn_order = player list
 
+(*The initial state of the game*)
+val init_state : game_state
+
+(*Advances the game to another state*)
+val advance_state : game_state -> unit
+
+(*makes a player*)
+val make_player : string -> player
+
+(* Returns whether this game state is done betting or not.*)
+val done_betting : game_state -> bool
+
+(*Raise,fold, and check update game state as appropriately.*)
+val raise : game_state -> int -> unit
+val fold : game_state -> unit
+val check : game_state -> unit
+
+(*Incredments the state for whos betting*)
+val increment : game_state -> unit
 val next_turn : unit -> unit
 val top_bet : turn_order -> int
 val valid_bet : player -> turn_order -> int -> bool

@@ -1,16 +1,21 @@
 open Cards
 
+exception Impossible
+
 type player = {
   name : string;
   hand : card list;
   money : int;
   bet : int;
+  folded : bool;
 }
 
 type pot = {
   amount : int;
   side_pots : int list;
 }
+
+type options = { starting_money : int }
 
 type game_stage =
   | Begin
@@ -20,7 +25,7 @@ type game_stage =
   | Turn
   | Third_Bet of int
   | River
-  | Final_bet of int
+  | Final_Bet of int
   | Finish
 
 (* Game_state represesnts the state of the game, containing the stage, the
@@ -32,6 +37,7 @@ type game_state = {
   mutable deck : card list;
   mutable community_cards : card list;
   mutable current_bet : int;
+  mutable options : options;
 }
 
 let init_state =
@@ -42,7 +48,43 @@ let init_state =
     deck = [];
     community_cards = [];
     current_bet = 0;
+    options = { starting_money = 0 };
   }
+
+let advance_state x = ()
+let make_player name = { name; hand = []; money = 500; bet = 0; folded = false }
+
+let done_betting_helper playa current =
+  if playa.money = 0 then true else playa.money = current
+
+let done_betting status =
+  if status.current_bet = 0 then false
+  else
+    List.fold_left
+      (fun boolean playa ->
+        boolean && done_betting_helper playa status.current_bet)
+      true status.players
+
+let increment status =
+  let n = List.length status.players in
+  match status.stage with
+  | First_Bet x ->
+      status.stage <- First_Bet ((x + 1) mod n);
+      ()
+  | Second_Bet x ->
+      status.stage <- Second_Bet ((x + 1) mod n);
+      ()
+  | Third_Bet x ->
+      status.stage <- Third_Bet ((x + 1) mod n);
+      ()
+  | Final_Bet x ->
+      status.stage <- Final_Bet ((x + 1) mod n);
+      ()
+  | _ -> raise Impossible
+
+let fold status = status.folded = true
+let raise status amount = ()
+let check status = ()
 
 let string_of_player p =
   "Name = " ^ p.name ^ "Hand = hand " ^ "Money = " ^ string_of_int p.money
@@ -74,7 +116,13 @@ let valid_bet p plist b =
   all players in the hand b is an integer value of the bet amount*)
 let make_bet p plist b =
   if valid_bet p plist b then
-    { name = p.name; hand = p.hand; money = p.money - b; bet = p.bet + b }
+    {
+      name = p.name;
+      hand = p.hand;
+      money = p.money - b;
+      bet = p.bet + b;
+      folded = p.folded;
+    }
   else p
 
 (*retruns the amount it would take for the player to call*)
