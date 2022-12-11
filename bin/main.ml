@@ -33,6 +33,29 @@ let select () =
          "\n\nLet's begin the game!\n");
       ()
 
+(*flop_call draws x cards from the deck and adds them to the community pile. *)
+let flop_call x =
+  Engine.flop state x;
+  ()
+
+(*Cleanup advances state to the next game*)
+let cleanup =
+  Engine.cleanup state true;
+  ()
+
+(*Bet call preforms a single bet for the player*)
+let rec bet_call () =
+  ANSITerminal.print_string [ ANSITerminal.magenta ]
+    ("Current Bet is " ^ string_of_int state.current_bet);
+  print_string "Would you like to check, raise, or fold?";
+  match String.lowercase_ascii (read_line ()) with
+  | "check" -> Engine.check state 0
+  | "raise" -> ()
+  | "fold" -> Engine.fold state 0
+  | _ ->
+      print_string "Sorry, that is an invalid option. Please try again";
+      bet_call ()
+
 let ai_bet player_number =
   match
     Ai.make_decision state.current_bet state.community_cards
@@ -48,26 +71,7 @@ let ai_bet player_number =
       Engine.raise state player_number x;
       ()
 
-let rec bet_call () =
-  ANSITerminal.print_string [ ANSITerminal.magenta ]
-    ("Current Bet is " ^ string_of_int state.current_bet);
-  print_string "Would you like to check, raise, or fold?";
-  match String.lowercase_ascii (read_line ()) with
-  | "check" -> Engine.check state 0
-  | "raise" -> ()
-  | "fold" -> Engine.fold state 0
-  | _ ->
-      print_string "Sorry, that is an invalid option. Please try again";
-      bet_call ()
-
-let flop_call x =
-  Engine.flop state x;
-  ()
-
-let cleanup =
-  Engine.cleanup state true;
-  ()
-
+(*Makes a bet, and checks if everyone is done betting.*)
 let rec bet x =
   if Engine.done_betting state then ()
   else if x = 0 then (
@@ -76,6 +80,8 @@ let rec bet x =
   else ai_bet x;
   Engine.increment state
 
+(* Tick is the function that advances the game state.e Tick calls functions that
+   print out the gui and mutate state. Ticks calls itself once its done.*)
 let rec tick () =
   match state.stage with
   | Begin ->

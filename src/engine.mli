@@ -59,7 +59,8 @@ val make_player : string -> player
 (* Returns whether this game state is done betting or not.*)
 val done_betting : game_state -> bool
 
-(*Raise,fold, and check update game state as appropriately.*)
+(*Raise,fold, and check update game state as appropriately given a state, play
+  number, and if raising, a amount betted.*)
 val raise : game_state -> int -> int -> unit
 val fold : game_state -> int -> unit
 val check : game_state -> int -> unit
