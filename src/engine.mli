@@ -60,7 +60,7 @@ val make_player : string -> player
 val done_betting : game_state -> bool
 
 (*Raise,fold, and check update game state as appropriately.*)
-val raise : game_state -> int -> int -> unit 
+val raise : game_state -> int -> int -> unit
 val fold : game_state -> int -> unit
 val check : game_state -> 'a -> unit
 
@@ -73,6 +73,7 @@ val make_bet : player -> turn_order -> int -> player
 val call_amount : player -> turn_order -> int
 val is_side_pot : turn_order -> bool
 val all_in : player -> bool
+
 (* val set_bet : game_state -> player -> int -> unit *)
 (*retruns a list of the vaious bet amounts of each sidepot ordered from lowest
   to highest*)
