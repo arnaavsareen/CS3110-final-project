@@ -56,6 +56,7 @@ val hidden_flop0_str : string
 val hidden_flop1_str : string
 val hidden_flop2_str : string
 val hidden_flop3_str : string
+val hidden_flop4_str : string
 val flop_str : string
 
 module Hand : sig

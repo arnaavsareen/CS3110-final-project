@@ -71,7 +71,7 @@ let str_number = function
   | Number 13 -> "Q"
   | Number 12 -> "K"
   | Number 11 -> "J"
-  | Number n -> string_of_int n
+  | Number n -> if n = 10 then "A" else string_of_int n
 
 let shuffle arr =
   Random.self_init ();
