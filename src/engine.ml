@@ -126,7 +126,7 @@ let make_bet p plist b =
 let rec list_remove x list =
   match list with
   | [] -> []
-  | h :: t -> if h = x then list_remove x t else list_remove x (h :: t)
+  | h :: t -> if h = x then list_remove x t else h :: list_remove x t
 
 let rec valid_check plist =
   match plist with

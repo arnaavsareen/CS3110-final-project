@@ -112,6 +112,76 @@ let rec tick () =
       tick ()
   | Finish -> cleanup
 
+(*Prints what the dealer says to the player everytime before the player gets a
+  chance to bet*)
+let print_dealer () =
+  print_string "\nYou have three options -\n";
+  print_string "1. To check, type in 'check'\n";
+  print_string "2. To raise, type in 'raise'\n";
+  print_string "3. To fold, type in 'fold'\n";
+  print_string "> "
+
+let rec tick2 () =
+  match state.stage with
+  | Begin -> (
+      print_string hidden_flop0_str;
+      print_dealer ();
+      bet_call ();
+      let aidecision =
+        Ai.make_decision state.current_bet (List.nth state.players 1).hand
+      in
+      match aidecision with
+      | Fold ->
+          print_string "TERA, folded, You win!";
+          exit 0
+      | Check ->
+          state.stage <- Turn;
+          tick2 ())
+  | Flop -> (
+      print_string hidden_flop1_str;
+      print_dealer ();
+      bet_call ();
+      let aidecision =
+        Ai.make_decision state.current_bet (List.nth state.players 1).hand
+      in
+      match aidecision with
+      | Fold ->
+          print_string "TERA, folded, You win!";
+          exit 0
+      | Check ->
+          state.stage <- Turn;
+          tick2 ())
+  | Turn -> (
+      print_string hidden_flop2_str;
+      print_dealer ();
+      bet_call ();
+      let aidecision =
+        Ai.make_decision state.current_bet (List.nth state.players 1).hand
+      in
+      match aidecision with
+      | Fold ->
+          print_string "TERA, folded, You win!";
+          exit 0
+      | Check ->
+          state.stage <- River;
+          tick2 ())
+  | River -> (
+      print_string hidden_flop3_str;
+      print_dealer ();
+      bet_call ();
+      let aidecision =
+        Ai.make_decision state.current_bet (List.nth state.players 1).hand
+      in
+      match aidecision with
+      | Fold ->
+          print_string "TERA, folded, You win!";
+          exit 0
+      | Check ->
+          state.stage <- Finish;
+          tick2 ())
+  | Finish -> cleanup
+  | _ -> failwith "should not occur"
+
 let rec playgame () =
   ANSITerminal.print_string [ ANSITerminal.magenta ]
     " \n\
@@ -352,4 +422,50 @@ let rec playgame () =
       | "P" -> playgame ()
       | _ -> ())
 
-let () = playgame ()
+let rec playgame2 () =
+  print_string "Enter your player name.\n";
+  print_string "Example: Arnaav; Example Tyler; Example Ryan; Example: Eric\n";
+  print_string "> ";
+  match read_line () with
+  | exception End_of_file -> ()
+  | userchoice -> (
+      let playername = userchoice ^ " " in
+      let playerinputlst = String.split_on_char ' ' playername in
+      let playerlst = List.filter (fun s -> s <> "") playerinputlst in
+      let user = Engine.make_player playername in
+      let tera = Engine.make_player "TERA" in
+      let plist = [ user; tera ] in
+      state.players <- plist;
+      ANSITerminal.print_string [ ANSITerminal.magenta ] "\nWelcome - ";
+      print_list playerlst;
+      ANSITerminal.print_string [ ANSITerminal.magenta ]
+        "\n\nLet's begin the game!\n\n";
+      (* print_string (table playername); *)
+      print_string "\nBoth players have 500 chips each.\n";
+      print_string "The buy in for each player is 10 chips.\n";
+      print_string (playername ^ ", type 'buy in' to place your buy in bet!\n");
+      print_string "> ";
+      let user_after_buyin = buyin_call user plist 10 in
+      print_string
+        ("You have " ^ string_of_int user_after_buyin.money ^ " chips left\n");
+      let tera_after_buyin = buyin_call tera plist 10 in
+      print_string
+        ("TERA has " ^ string_of_int tera_after_buyin.money ^ " chips left\n");
+      print_string "\n";
+      print_string
+        "Now that you have placed your buy in, you will be dealt 2 cards from \
+         the deck. \n";
+      print_string "\n";
+      print_string deal;
+      print_string "\nEnter any key to overturn your cards!\n";
+      print_string "> ";
+      match read_line () with
+      | exception End_of_file -> failwith "error"
+      | userchoice ->
+          print_string overturn_deal;
+          print_string "\nRemember your cards :))\n";
+          print_string "\nTERA has also been dealt two cards.\n";
+
+          tick2 ())
+
+let () = playgame2 ()
