@@ -41,6 +41,10 @@ type game_state = {
   mutable options : options;
 }
 
+exception Invalid_Bet of string
+exception Invalid_Check of string
+exception Invalid_Call of string
+
 let init_state =
   {
     stage = Begin;
@@ -137,23 +141,23 @@ let fold status player_num =
     change_to_fold (List.nth status.players player_num)
     :: list_remove (List.nth status.players player_num) status.players
 
-let raise status player_num amount =
+let raise_bet status player_num amount =
   let p = List.nth status.players player_num in
   if make_bet p status.players amount != p then
     status.players <-
       make_bet p status.players amount :: list_remove p status.players
-  else failwith "Invalid bet" (*we can chenge this later*)
+  else raise (Invalid_Bet "Invalid bet")
 
 let call status player_num amount =
   let p = List.nth status.players player_num in
   if amount = call_amount p status.players then
     status.players <-
       make_bet p status.players amount :: list_remove p status.players
-  else failwith "not a valid call"
+  else raise (Invalid_Call "Invalid Call")
 
 let check status player_num =
   if valid_check status.players then ()
-  else failwith "Not allowed to check" (*we can chenge this later*)
+  else raise (Invalid_Check "invalid check")
 
 let deal status cards = status cards
 let flop status cards = status cards
