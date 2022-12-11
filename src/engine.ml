@@ -126,6 +126,10 @@ let rec valid_check plist =
 let change_to_fold p =
   { name = p.name; hand = p.hand; money = p.money; bet = 0; folded = true }
 
+(*retruns the amount it would take for the player to call*)
+let call_amount p plist =
+  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
+
 let fold status player_num =
   status.players <-
     change_to_fold (List.nth status.players player_num)
@@ -137,6 +141,13 @@ let raise status player_num amount =
     status.players <-
       make_bet p status.players amount :: list_remove p status.players
   else failwith "Invalid bet" (*we can chenge this later*)
+
+let raise status player_num amount =
+  let p = List.nth status.players player_num in
+  if amount = call_amount p status.players then
+    status.players <-
+      make_bet p status.players amount :: list_remove p status.players
+  else failwith "not a valid call"
 
 let check status player_num =
   if valid_check status.players then ()
@@ -155,10 +166,6 @@ type turn_order = player list
 type list_int = int list
 
 let next_turn x = ()
-
-(*retruns the amount it would take for the player to call*)
-let call_amount p plist =
-  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
 
 (*retruns true if there will be a side pot false otherwise*)
 let rec is_side_pot plist =
