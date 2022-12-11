@@ -188,6 +188,7 @@ let rec playgame () =
           let user = Engine.make_player playername in
           let tera = Engine.make_player "TERA" in
           let plist = [ user; tera ] in
+          state.players <- plist;
           ANSITerminal.print_string [ ANSITerminal.magenta ] "\nWelcome - ";
           print_list playerlst;
           ANSITerminal.print_string [ ANSITerminal.magenta ]
