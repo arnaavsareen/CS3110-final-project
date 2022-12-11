@@ -143,11 +143,12 @@ let raise_bet status player_num amount =
       make_bet p status.players amount :: list_remove p status.players
   else raise (Invalid_Bet "Invalid bet")
 
-let call status player_num amount =
+let call status player_num =
   let p = List.nth status.players player_num in
-  if amount = call_amount p status.players then
+  let call_am = call_amount p status.players in
+  if valid_bet p status.players call_am then
     status.players <-
-      make_bet p status.players amount :: list_remove p status.players
+      make_bet p status.players call_am :: list_remove p status.players
   else raise (Invalid_Call "Invalid Call")
 
 let check status player_num =
