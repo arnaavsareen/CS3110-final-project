@@ -142,7 +142,7 @@ let raise status player_num amount =
       make_bet p status.players amount :: list_remove p status.players
   else failwith "Invalid bet" (*we can chenge this later*)
 
-let raise status player_num amount =
+let call status player_num amount =
   let p = List.nth status.players player_num in
   if amount = call_amount p status.players then
     status.players <-
