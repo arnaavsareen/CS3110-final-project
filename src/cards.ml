@@ -179,6 +179,36 @@ let hidden_flop3_str =
   let tail1 = " ----------------------------------------------- \n" in
   head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ tail1
 
+let hidden_flop4_str =
+  let head1 = " ----------------------------------------------- \n" in
+  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
+  let card2 =
+    "│      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │ │ " ^ num3
+    ^ "       │      │\n"
+  in
+  let card3 = "│      │         │ │         │ │         │      │\n" in
+  let card4 =
+    "│      │    " ^ suit1 ^ "    │ │    " ^ suit2 ^ "    │ │    " ^ suit3
+    ^ "    │      │\n"
+  in
+  let card5 = "│      │         │ │         │ │         │      │\n" in
+  let card6 = "│      │         │ │         │ │         │      │\n" in
+  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
+  let card11 = "│      ┌─────────┐                              │\n" in
+  let card12 =
+    "│      │ " ^ num4 ^ "       │                              │\n"
+  in
+  let card13 = "│      │         │                              │\n" in
+  let card14 =
+    "│      │    " ^ suit4 ^ "    │                              │\n"
+  in
+  let card15 = "│      │         │                              │\n" in
+  let card16 = "│      │         │                              │\n" in
+  let card17 = "│      └─────────┘                              │\n" in
+  let tail1 = " ----------------------------------------------- \n" in
+  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ card11
+  ^ card12 ^ card13 ^ card14 ^ card15 ^ card16 ^ card17 ^ tail1
+
 let flop_str =
   let head1 = " ----------------------------------------------- \n" in
   let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
