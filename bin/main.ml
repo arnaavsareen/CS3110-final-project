@@ -4,6 +4,7 @@ open Cards
 open Ai
 open Engine
 open Tableui
+open Cards
 
 exception Unimplemented of string
 
@@ -47,15 +48,41 @@ let cleanup =
 (*Buy in for AI and player *)
 let rec buyin_call p plist b = make_bet p plist 10
 
+(*Prints what the dealer says to the player everytime before the player gets a
+  chance to bet*)
+let print_dealer () =
+  print_string "\nYou have three options -\n";
+  print_string "1. To check, type in 'check'\n";
+  print_string "2. To raise, type in 'raise'\n";
+  print_string "3. To fold, type in 'fold'\n";
+  print_string "> "
+
 (*Bet call preforms a single bet for the player*)
 let rec bet_call () =
+  print_string
+    ("You have "
+    ^ string_of_int (List.hd state.players).money
+    ^ " money left" ^ "\n");
+  print_dealer ();
   match read_line () with
-  | "check" -> Engine.check state 0
-  | "raise" ->
-      print_string "Enter amount to raise by\n";
+  | "check" -> (
+      try Engine.check state 0
+      with e ->
+        print_string
+          "Sorry, that bet is invalid, enter raise check or fold again: ";
+        bet_call ())
+  | "raise" -> (
+      print_string
+        ("You must raise by at least "
+        ^ string_of_int (2 * Engine.top_bet state.players)
+        ^ "\n" ^ "Enter amount to raise by\n");
       print_string "> ";
       let amount = int_of_string (read_line ()) in
-      Engine.raise state 0 amount
+      try Engine.raise_bet state 0 amount
+      with e ->
+        print_string
+          "Sorry, that bet is invalid, enter raise check or fold again: ";
+        bet_call ())
   | "fold" ->
       ANSITerminal.print_string [ ANSITerminal.green ] "\nTERA WINS!!!\n";
       exit 0
@@ -72,6 +99,7 @@ let ai_bet plyr =
   | Check ->
       Engine.check state 1;
       ()
+  | _ -> failwith "todo"
 
 (*Makes a bet, and checks if everyone is done betting.*)
 let rec bet x =
@@ -110,76 +138,66 @@ let rec tick () =
       state.stage <- Finish;
       (* Engine.deal state 2; *)
       tick ()
-  | Finish -> cleanup
+  | Finish -> failwith "sorry i forget what you had here deleted by accident"
 
-(*Prints what the dealer says to the player everytime before the player gets a
-  chance to bet*)
-let print_dealer () =
-  print_string "\nYou have three options -\n";
-  print_string "1. To check, type in 'check'\n";
-  print_string "2. To raise, type in 'raise'\n";
-  print_string "3. To fold, type in 'fold'\n";
-  print_string "> "
+let execute_aidecision state =
+  let aidecision =
+    Ai.make_decision state.current_bet (List.nth state.players 1).hand
+  in
+  match aidecision with
+  | Fold ->
+      print_string "TERA, folded, You win!";
+      exit 0
+  | Check -> ()
+  | Raise ->
+      let r = Engine.top_bet state.players * 2 in
+      print_string ("TERA has raised by " ^ string_of_int r ^ "\n");
+      Engine.raise_bet state 1 r
+  | Call ->
+      Engine.call state 1;
+      print_string
+        ("Tera has called, to put his bet at a total of "
+        ^ string_of_int (List.nth state.players 1).bet)
 
 let rec tick2 () =
   match state.stage with
-  | Begin -> (
-      print_string hidden_flop0_str;
-      print_dealer ();
+  | Begin ->
       bet_call ();
-      let aidecision =
-        Ai.make_decision state.current_bet (List.nth state.players 1).hand
-      in
-      match aidecision with
-      | Fold ->
-          print_string "TERA, folded, You win!";
-          exit 0
-      | Check ->
-          state.stage <- Turn;
-          tick2 ())
-  | Flop -> (
+      execute_aidecision state;
+      state.stage <- Flop;
+      tick2 ()
+  | Flop ->
       print_string hidden_flop1_str;
-      print_dealer ();
+
       bet_call ();
-      let aidecision =
-        Ai.make_decision state.current_bet (List.nth state.players 1).hand
-      in
-      match aidecision with
-      | Fold ->
-          print_string "TERA, folded, You win!";
-          exit 0
-      | Check ->
-          state.stage <- Turn;
-          tick2 ())
-  | Turn -> (
+      execute_aidecision state;
+      state.stage <- Turn;
+      tick2 ()
+  | Turn ->
       print_string hidden_flop2_str;
-      print_dealer ();
+
       bet_call ();
-      let aidecision =
-        Ai.make_decision state.current_bet (List.nth state.players 1).hand
-      in
-      match aidecision with
-      | Fold ->
-          print_string "TERA, folded, You win!";
-          exit 0
-      | Check ->
-          state.stage <- River;
-          tick2 ())
-  | River -> (
+      execute_aidecision state;
+      state.stage <- River;
+      tick2 ()
+  | River ->
       print_string hidden_flop3_str;
-      print_dealer ();
+
       bet_call ();
-      let aidecision =
-        Ai.make_decision state.current_bet (List.nth state.players 1).hand
-      in
-      match aidecision with
-      | Fold ->
-          print_string "TERA, folded, You win!";
-          exit 0
-      | Check ->
-          state.stage <- Finish;
-          tick2 ())
-  | Finish -> cleanup
+      execute_aidecision state;
+      state.stage <- Finish;
+      tick2 ()
+  | Finish ->
+      if List.length state.players = 1 then print_string "You win the round!"
+      else
+        (* let player_hand_cards = (List.hd state.players).hand in let
+           ai_hand_cards = (List.nth state.players 1).hand in let ai_hand =
+           Hand.init_hand (ai_hand_cards @ state.deck) in let player_hand =
+           Hand.init_hand (player_hand_cards @ state.deck) in match Hand.compare
+           ai_hand player_hand with | 0 -> print_string "It's a tie!!" | 1 ->
+           print_string "TERA wins the round!!" | -1 -> print_string "You win
+           the round!!" | _ -> failwith "not possible") *)
+        print_string "Your hand was better! You win!"
   | _ -> failwith "should not occur"
 
 let rec playgame () =
@@ -306,7 +324,7 @@ let rec playgame () =
                       print_string "Enter amount to raise by\n";
                       print_string "> ";
                       let amount = int_of_string (read_line ()) in
-                      Engine.raise state 0 amount
+                      Engine.raise_bet state 0 amount
                   | "fold" ->
                       ANSITerminal.print_string [ ANSITerminal.green ]
                         "\nTERA WINS!!!\n";
@@ -326,7 +344,12 @@ let rec playgame () =
                   | Check ->
                       print_string "TERA checked.\n";
                       Engine.check state 1;
-                      ());
+                      ()
+                  | Raise ->
+                      print_string "TERA raised by 100";
+                      Engine.raise_bet state 1 100
+                  | Call -> failwith "nothing");
+
                   print_string
                     "Now that both players have had a chance to bet, it is \
                      time for the flop.  \n";
@@ -352,7 +375,7 @@ let rec playgame () =
                           print_string "Enter amount to raise by\n";
                           print_string "> ";
                           let amount = int_of_string (read_line ()) in
-                          Engine.raise state 0 amount
+                          Engine.raise_bet state 0 amount
                       | "fold" ->
                           ANSITerminal.print_string [ ANSITerminal.green ]
                             "\nTERA WINS!!!\n";
@@ -372,8 +395,11 @@ let rec playgame () =
                           exit 0
                       | Check ->
                           print_string "TERA checked.\n";
-                          Engine.check state 1;
-                          ());
+                          Engine.check state 1
+                      | Raise ->
+                          print_string "TERA raised by 100";
+                          Engine.raise_bet state 1 100
+                      | Call -> failwith "nothing");
                       print_string
                         "Now that both players have had a chance to bet, it is \
                          time for the river.\n";
