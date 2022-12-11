@@ -55,6 +55,7 @@ let print_dealer () =
   print_string "1. To check, type in 'check'\n";
   print_string "2. To raise, type in 'raise'\n";
   print_string "3. To fold, type in 'fold'\n";
+  print_string "4. To call, type in 'call'\n";
   print_string "> "
 
 (*Bet call preforms a single bet for the player*)
@@ -86,6 +87,7 @@ let rec bet_call () =
   | "fold" ->
       ANSITerminal.print_string [ ANSITerminal.green ] "\nTERA WINS!!!\n";
       exit 0
+  | "call" -> Engine.call state 0
   | _ ->
       ANSITerminal.print_string [ ANSITerminal.red ] "\nWrong input!";
       exit 0
@@ -157,7 +159,8 @@ let execute_aidecision state =
       Engine.call state 1;
       print_string
         ("Tera has called, to put his bet at a total of "
-        ^ string_of_int (List.nth state.players 1).bet)
+        ^ string_of_int (List.nth state.players 1).bet
+        ^ "\n")
 
 let rec tick2 () =
   match state.stage with
@@ -167,7 +170,7 @@ let rec tick2 () =
       state.stage <- Flop;
       tick2 ()
   | Flop ->
-      print_string hidden_flop1_str;
+      print_string hidden_flop3_str;
 
       bet_call ();
       execute_aidecision state;
@@ -181,7 +184,7 @@ let rec tick2 () =
       state.stage <- River;
       tick2 ()
   | River ->
-      print_string hidden_flop3_str;
+      print_string flop_str;
 
       bet_call ();
       execute_aidecision state;
@@ -197,7 +200,7 @@ let rec tick2 () =
            ai_hand player_hand with | 0 -> print_string "It's a tie!!" | 1 ->
            print_string "TERA wins the round!!" | -1 -> print_string "You win
            the round!!" | _ -> failwith "not possible") *)
-        print_string "Your hand was better! You win!"
+        print_string "Your hand was better! You win! \n"
   | _ -> failwith "should not occur"
 
 let rec playgame () =
@@ -468,20 +471,6 @@ let rec playgame2 () =
         "\n\nLet's begin the game!\n\n";
       (* print_string (table playername); *)
       print_string "\nBoth players have 500 chips each.\n";
-      print_string "The buy in for each player is 10 chips.\n";
-      print_string (playername ^ ", type 'buy in' to place your buy in bet!\n");
-      print_string "> ";
-      let user_after_buyin = buyin_call user plist 10 in
-      print_string
-        ("You have " ^ string_of_int user_after_buyin.money ^ " chips left\n");
-      let tera_after_buyin = buyin_call tera plist 10 in
-      print_string
-        ("TERA has " ^ string_of_int tera_after_buyin.money ^ " chips left\n");
-      print_string "\n";
-      print_string
-        "Now that you have placed your buy in, you will be dealt 2 cards from \
-         the deck. \n";
-      print_string "\n";
       print_string deal;
       print_string "\nEnter any key to overturn your cards!\n";
       print_string "> ";
