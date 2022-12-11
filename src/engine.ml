@@ -48,7 +48,7 @@ let init_state =
     pot = { amount = 0; side_pots = [] };
     deck = [];
     community_cards = [];
-    current_bet = 0;
+    current_bet = 10;
     options = { starting_money = 0 };
   }
 
@@ -131,7 +131,7 @@ let fold status player_num =
     change_to_fold (List.nth status.players player_num)
     :: list_remove (List.nth status.players player_num) status.players
 
-let bet status player_num amount =
+let raise status player_num amount =
   let p = List.nth status.players player_num in
   if make_bet p status.players amount != p then
     status.players <-
@@ -142,9 +142,9 @@ let check status player_num =
   if valid_check status.players then ()
   else failwith "Not allowed to check" (*we can chenge this later*)
 
-let deal status cards = ()
-let flop status cards = ()
-let cleanup status bool = ()
+let deal status cards = status cards
+let flop status cards = status cards
+let cleanup status bool = status bool
 
 let string_of_player p =
   "Name = " ^ p.name ^ "Hand = hand " ^ "Money = " ^ string_of_int p.money
@@ -218,6 +218,8 @@ let rec main_pot_amount plist =
 
 let update_pot state =
   state.pot <- { amount = main_pot_amount state.players; side_pots = [] }
+
+(* let set_bet = () *)
 
 (*{ amount = main_pot_amount plist; side_pots = [] }*)
 (*testing*)
