@@ -21,3 +21,4 @@ val all_in : player -> bool
 val side_pot_amount : turn_order -> int list
 val side_pot_list : turn_order -> int list
 val fix_values : int list -> int list
+val total_side_pot_player : turn_order -> int -> int list

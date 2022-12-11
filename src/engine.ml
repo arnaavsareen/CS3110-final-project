@@ -7,11 +7,6 @@ type player = {
   bet : int;
 }
 
-type pot = {
-  amount : int;
-  side_pots : int list;
-}
-
 let string_of_player p =
   "Name = " ^ p.name ^ "Hand = hand " ^ "Money = " ^ string_of_int p.money
   ^ " Bet = " ^ string_of_int p.money
@@ -83,10 +78,22 @@ let rec side_pot_list plist =
         else side_pot_list t
   else []
 
-let rec side_pot_amount plist =
+let rec total_side_pot_player plist b =
   match plist with
   | [] -> []
-  | h :: t -> []
+  | h :: t ->
+      if h.bet > b then b :: total_side_pot_player t b
+      else total_side_pot_player t b
+
+let rec sum_list l =
+  match l with
+  | [] -> 0
+  | h :: t -> h + sum_list t
+
+let rec total_pot_value plist =
+  match plist with
+  | [] -> 0
+  | h :: t -> h.bet + total_pot_value t
 
 let rec main_pot_amount plist =
   match plist with

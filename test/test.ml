@@ -71,12 +71,17 @@ let is_side_pot_test name turn_order expected_output =
 let side_pot_list_test name turn_order expected_output =
   name >:: fun _ ->
   assert_equal expected_output (side_pot_list turn_order) ~printer:(fun a ->
-      "side pot test error")
+      list_to_string string_of_int a)
 
 let fix_value_test name list_int expected_output =
   name >:: fun _ ->
   assert_equal expected_output (fix_values list_int) ~printer:(fun a ->
-      "fix value error")
+      list_to_string string_of_int a)
+
+let total_side_pot_player_test name turn_order int expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (total_side_pot_player turn_order int)
+    ~printer:(fun a -> list_to_string string_of_int a)
 
 let tyler =
   { name = "tyler"; hand = [ fourC; sevenH ]; money = 1000; bet = 100 }
@@ -126,6 +131,7 @@ let tests =
          fix_value_test "testing fix values" test_list [ 90; 10 ];
          side_pot_list_test "testing side pot" plist [ 90 ];
          side_pot_list_test "testing side pot" plist1 [ 90; 10 ];
+         total_side_pot_player_test "testing";
        ]
 
 let _ = run_test_tt_main tests
