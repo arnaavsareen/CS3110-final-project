@@ -1,4 +1,5 @@
 open Cards
+open Stdlib
 
 exception Impossible
 
@@ -125,6 +126,10 @@ let make_bet p plist b =
     }
   else p
 
+let set_bet state p b =
+  if make_bet p state.players b != p then
+    state.players <- make_bet p state.players b :: List.remove p state.players
+
 (*retruns the amount it would take for the player to call*)
 let call_amount p plist =
   if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
@@ -185,4 +190,8 @@ let rec main_pot_amount plist =
   | [] -> 0
   | h :: t -> h.bet + main_pot_amount t
 
+let set_pot state =
+  state.pot <- { amount = main_pot_amount state.players; side_pots = [] }
+
+(*{ amount = main_pot_amount plist; side_pots = [] }*)
 (*testing*)
