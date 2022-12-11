@@ -92,9 +92,18 @@ val update_pot : game_state -> unit
 (*Incredments the state for whos betting*)
 val increment : game_state -> unit
 val next_turn : unit -> unit
+
+(*iterates through the list of players and returns the highest bet*)
 val top_bet : turn_order -> int
+
+(*checks to see if the bet is valid for the given player*)
 val valid_bet : player -> turn_order -> int -> bool
+
+(*if the bet is valid it returns a new player with the bet updated, otherwise it
+  returns the original player*)
 val make_bet : player -> turn_order -> int -> player
+
+(*returns the amount a given player would need to bet to call a bet*)
 val call_amount : player -> turn_order -> int
 val is_side_pot : turn_order -> bool
 val all_in : player -> bool
