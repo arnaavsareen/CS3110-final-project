@@ -409,3 +409,28 @@ module Hand = struct
         "Flush " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3
 end
+
+let card_to_string c =
+  match c with
+  | { suit = Clubs; number = Number i } -> string_of_int i ^ " of Clubs"
+  | { suit = Hearts; number = Number i } -> string_of_int i ^ " of Hearts"
+  | { suit = Spades; number = Number i } -> string_of_int i ^ " of Spades"
+  | { suit = Diamonds; number = Number i } -> string_of_int i ^ " of Diamonds"
+
+let rec list_to_string f lst =
+  let rec matching lst =
+    match lst with
+    | [] -> "]"
+    | h :: t -> f h ^ "; " ^ matching t
+  in
+  "[" ^ matching lst
+
+let int_card_pair_to_string (c, i) =
+  "(" ^ card_to_string c ^ ", " ^ string_of_int i ^ ")"
+
+let number_int_pair_to_string (n, i) =
+  "("
+  ^ string_of_int
+      (match n with
+      | Number a -> a)
+  ^ ", " ^ string_of_int i ^ ")"
