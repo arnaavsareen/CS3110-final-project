@@ -9,6 +9,7 @@ type player = {
   money : int;
   bet : int;
   folded : bool;
+  position : int;
 }
 
 type pot = {
@@ -57,16 +58,23 @@ let init_state =
   }
 
 let advance_state x = ()
-let make_player name = { name; hand = []; money = 500; bet = 0; folded = false }
 
-(*Returns the highest bet so far plist is a list of all the players in the
-  hand*)
+let sort_list plist =
+  List.sort
+    (fun a b ->
+      if a.position > b.position then 1
+      else if a.position > b.position then -1
+      else 0)
+    plist
+
+let make_player name =
+  { name; hand = []; money = 500; bet = 0; folded = false; position = 1 }
+
 let rec top_bet plist =
   match plist with
   | [] -> 0
   | h :: t -> Stdlib.max h.bet (top_bet t)
 
-(*retruns the amount it would take for the player to call*)
 let call_amount p plist =
   if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
 
@@ -115,6 +123,7 @@ let make_bet p plist b =
       money = p.money - b;
       bet = p.bet + b;
       folded = p.folded;
+      position = p.position;
     }
   else p
 
@@ -129,25 +138,34 @@ let rec valid_check plist =
   | h :: t -> if h.bet > 0 then false else valid_check t
 
 let change_to_fold p =
-  { name = p.name; hand = p.hand; money = p.money; bet = 0; folded = true }
+  {
+    name = p.name;
+    hand = p.hand;
+    money = p.money;
+    bet = 0;
+    folded = true;
+    position = p.position;
+  }
 
 let fold status player_num =
   status.players <-
-    change_to_fold (List.nth status.players player_num)
-    :: list_remove (List.nth status.players player_num) status.players
+    sort_list
+      (change_to_fold (List.nth status.players player_num)
+      :: list_remove (List.nth status.players player_num) status.players)
 
 let raise_bet status player_num amount =
   let p = List.nth status.players player_num in
   if make_bet p status.players amount != p then
     status.players <-
-      make_bet p status.players amount :: list_remove p status.players
+      sort_list
+        (make_bet p status.players amount :: list_remove p status.players)
   else raise (Invalid_Bet "Invalid bet")
 
 let call status player_num =
   let p = List.nth status.players player_num in
   let call_am = call_amount p status.players in
   status.players <-
-    make_bet p status.players call_am :: list_remove p status.players
+    sort_list (make_bet p status.players call_am :: list_remove p status.players)
 
 let check status player_num =
   if valid_check status.players then ()
@@ -188,16 +206,17 @@ let rec fix_values x =
   | [ a; b; c; d; e; f; g ] -> [ a; b - a; c - b; d - c; e - d; f - e; g - f ]
   | h :: t -> [ 696969 ]
 
-let sort_list int_list = fix_values (List.sort compare int_list)
-
 (*retruns a list of the vaious bet amounts of each sidepot ordered from lowest
   to highest*)
+
+let sort_int_list list = List.sort compare list
+
 let rec side_pot_list plist =
   if is_side_pot plist then
     match plist with
     | [] -> []
     | h :: t ->
-        if all_in h = true then sort_list (h.bet :: side_pot_list t)
+        if all_in h = true then sort_int_list (h.bet :: side_pot_list t)
         else side_pot_list t
   else []
 
