@@ -78,6 +78,17 @@ val flop : game_state -> int -> unit
 (*Cleanup cleans up the given state for the next round or wipes it clean, given
   the boolean.*)
 val cleanup : game_state -> bool -> unit
+
+(*Deal deals out x cards to each player from the top of the deck*)
+val deal : game_state -> int -> unit
+
+(*Flop draws the first x cards from the deck and puts them into the community
+  pile.*)
+val flop : game_state -> int -> unit
+
+(*Cleanup cleans up the given state for the next round or wipes it clean, given
+  the boolean.*)
+val cleanup : game_state -> bool -> unit
 val next_turn : unit -> unit
 val top_bet : turn_order -> int
 val valid_bet : player -> turn_order -> int -> bool
