@@ -8,6 +8,7 @@ type player = {
   money : int;
   bet : int;
   folded : bool;
+  position : int;
 }
 
 (*pot represents the main pot with amount and side pot in side_pots*)
