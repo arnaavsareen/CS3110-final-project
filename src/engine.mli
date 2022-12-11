@@ -59,36 +59,13 @@ val make_player : string -> player
 (* Returns whether this game state is done betting or not.*)
 val done_betting : game_state -> bool
 
-(*Raise,fold, and check update game state as appropriately given a state, play
-  number, and if raising, a amount betted.*)
-val raise : game_state -> int -> int -> unit
-val fold : game_state -> int -> unit
-val check : game_state -> int -> unit
+(*Raise,fold, and check update game state as appropriately.*)
+val raise : game_state -> int -> unit
+val fold : game_state -> unit
+val check : game_state -> unit
 
 (*Incredments the state for whos betting*)
 val increment : game_state -> unit
-
-(*Deal deals out x cards to each player from the top of the deck*)
-val deal : game_state -> int -> unit
-
-(*Flop draws the first x cards from the deck and puts them into the community
-  pile.*)
-val flop : game_state -> int -> unit
-
-(*Cleanup cleans up the given state for the next round or wipes it clean, given
-  the boolean.*)
-val cleanup : game_state -> bool -> unit
-
-(*Deal deals out x cards to each player from the top of the deck*)
-val deal : game_state -> int -> unit
-
-(*Flop draws the first x cards from the deck and puts them into the community
-  pile.*)
-val flop : game_state -> int -> unit
-
-(*Cleanup cleans up the given state for the next round or wipes it clean, given
-  the boolean.*)
-val cleanup : game_state -> bool -> unit
 val next_turn : unit -> unit
 val top_bet : turn_order -> int
 val valid_bet : player -> turn_order -> int -> bool
@@ -100,7 +77,7 @@ val set_bet : game_state -> player -> int -> unit
 (*retruns a list of the vaious bet amounts of each sidepot ordered from lowest
   to highest*)
 
-val side_pot_amount : turn_order -> int list
+(*val side_pot_amount : turn_order -> int list*)
 val side_pot_list : turn_order -> int list
 val fix_values : int list -> int list
 val total_side_pot_player : turn_order -> int -> int list
