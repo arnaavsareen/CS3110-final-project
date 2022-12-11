@@ -84,7 +84,7 @@ val check : game_state -> 'a -> unit
   at the player number index from the list and concats a new updated player with
   the bet changed to the proper amount and returns unit, if the bet is invalid
   then it raises the Invalid_Call exception*)
-val call : game_state -> int -> int -> unit
+val call : game_state -> int -> unit
 
 (*Parameter: the current gamestate. update_pot: modifies the gamestate pot to be
   a new pot with the amount equal to the previous pot plus the sum of all the

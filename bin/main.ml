@@ -48,8 +48,22 @@ let cleanup =
 (*Buy in for AI and player *)
 let rec buyin_call p plist b = make_bet p plist 10
 
+(*Prints what the dealer says to the player everytime before the player gets a
+  chance to bet*)
+let print_dealer () =
+  print_string "\nYou have three options -\n";
+  print_string "1. To check, type in 'check'\n";
+  print_string "2. To raise, type in 'raise'\n";
+  print_string "3. To fold, type in 'fold'\n";
+  print_string "> "
+
 (*Bet call preforms a single bet for the player*)
 let rec bet_call () =
+  print_string
+    ("You have "
+    ^ string_of_int (List.hd state.players).money
+    ^ " money left" ^ "\n");
+  print_dealer ();
   match read_line () with
   | "check" -> (
       try Engine.check state 0
@@ -58,7 +72,10 @@ let rec bet_call () =
           "Sorry, that bet is invalid, enter raise check or fold again: ";
         bet_call ())
   | "raise" -> (
-      print_string "Enter amount to raise by\n";
+      print_string
+        ("You must raise by at least "
+        ^ string_of_int (2 * Engine.top_bet state.players)
+        ^ "\n" ^ "Enter amount to raise by\n");
       print_string "> ";
       let amount = int_of_string (read_line ()) in
       try Engine.raise_bet state 0 amount
@@ -123,15 +140,6 @@ let rec tick () =
       tick ()
   | Finish -> failwith "sorry i forget what you had here deleted by accident"
 
-(*Prints what the dealer says to the player everytime before the player gets a
-  chance to bet*)
-let print_dealer () =
-  print_string "\nYou have three options -\n";
-  print_string "1. To check, type in 'check'\n";
-  print_string "2. To raise, type in 'raise'\n";
-  print_string "3. To fold, type in 'fold'\n";
-  print_string "> "
-
 let execute_aidecision state =
   let aidecision =
     Ai.make_decision state.current_bet (List.nth state.players 1).hand
@@ -145,33 +153,36 @@ let execute_aidecision state =
       let r = Engine.top_bet state.players * 2 in
       print_string ("TERA has raised by " ^ string_of_int r ^ "\n");
       Engine.raise_bet state 1 r
-  | Call -> failwith "unimplemented"
+  | Call ->
+      Engine.call state 1;
+      print_string
+        ("Tera has called, to put his bet at a total of "
+        ^ string_of_int (List.nth state.players 1).bet)
 
 let rec tick2 () =
   match state.stage with
   | Begin ->
-      print_dealer ();
       bet_call ();
       execute_aidecision state;
       state.stage <- Flop;
       tick2 ()
   | Flop ->
       print_string hidden_flop1_str;
-      print_dealer ();
+
       bet_call ();
       execute_aidecision state;
       state.stage <- Turn;
       tick2 ()
   | Turn ->
       print_string hidden_flop2_str;
-      print_dealer ();
+
       bet_call ();
       execute_aidecision state;
       state.stage <- River;
       tick2 ()
   | River ->
       print_string hidden_flop3_str;
-      print_dealer ();
+
       bet_call ();
       execute_aidecision state;
       state.stage <- Finish;
