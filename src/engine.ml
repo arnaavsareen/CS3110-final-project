@@ -218,13 +218,17 @@ let rec total_pot_value plist =
   | [] -> 0
   | h :: t -> h.bet + total_pot_value t
 
-let rec main_pot_amount plist =
+let rec total_bet_amount plist =
   match plist with
   | [] -> 0
-  | h :: t -> h.bet + main_pot_amount t
+  | h :: t -> h.bet + total_bet_amount t
 
 let update_pot state =
-  state.pot <- { amount = main_pot_amount state.players; side_pots = [] }
+  state.pot <-
+    {
+      amount = state.pot.amount + total_bet_amount state.players;
+      side_pots = [];
+    }
 
 (* let set_bet = () *)
 
