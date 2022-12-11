@@ -50,9 +50,7 @@ let rec bet_call () =
   print_string "Would you like to check, raise, or fold?";
   match String.lowercase_ascii (read_line ()) with
   | "check" -> Engine.check state 0
-  | "check" -> Engine.check state 0
   | "raise" -> ()
-  | "fold" -> Engine.fold state 0
   | "fold" -> Engine.fold state 0
   | _ ->
       print_string "Sorry, that is an invalid option. Please try again";
@@ -110,26 +108,6 @@ let rec tick () =
       state.stage <- Finish;
       Engine.deal state 2;
       tick ()
-  | First_Bet x ->
-      bet_call ();
-      state.stage <- Flop;
-      tick ()
-  | Flop -> flop_call 3
-  | Second_Bet x ->
-      bet_call ();
-      state.stage <- Turn;
-      tick ()
-  | Turn -> flop_call 1
-  | Third_Bet x ->
-      bet_call ();
-      state.stage <- River;
-      tick ()
-  | River -> flop_call 1
-  | Final_Bet x ->
-      bet_call ();
-      state.stage <- Finish;
-      tick ()
-  | Finish -> cleanup
   | Finish -> cleanup
 
 let rec playgame () =
