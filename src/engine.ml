@@ -55,16 +55,29 @@ let init_state =
 let advance_state x = ()
 let make_player name = { name; hand = []; money = 500; bet = 0; folded = false }
 
-let done_betting_helper playa current =
-  if playa.money = 0 then true else playa.money = current
+(*Returns the highest bet so far plist is a list of all the players in the
+  hand*)
+let rec top_bet plist =
+  match plist with
+  | [] -> 0
+  | h :: t -> Stdlib.max h.bet (top_bet t)
+
+(*retruns the amount it would take for the player to call*)
+let call_amount p plist =
+  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
+
+let rec done_betting_help plist =
+  match plist with
+  | [] -> true
+  | h :: t ->
+      if
+        (h.bet = call_amount h plist || h.folded = true || h.money = 0)
+        && done_betting_help t
+      then true
+      else false
 
 let done_betting status =
-  if status.current_bet = 0 then false
-  else
-    List.fold_left
-      (fun boolean playa ->
-        boolean && done_betting_helper playa status.current_bet)
-      true status.players
+  if status.current_bet = 0 then false else done_betting_help status.players
 
 let increment status =
   let n = List.length status.players in
@@ -82,13 +95,6 @@ let increment status =
       status.stage <- Final_Bet ((x + 1) mod n);
       ()
   | _ -> raise Impossible
-
-(*Returns the highest bet so far plist is a list of all the players in the
-  hand*)
-let rec top_bet plist =
-  match plist with
-  | [] -> 0
-  | h :: t -> Stdlib.max h.bet (top_bet t)
 
 (*checks to see if the bet is valid p is the player making bet plist is a list
   of all players in the hand b is an integer value of the bet amount*)
@@ -125,10 +131,6 @@ let rec valid_check plist =
 
 let change_to_fold p =
   { name = p.name; hand = p.hand; money = p.money; bet = 0; folded = true }
-
-(*retruns the amount it would take for the player to call*)
-let call_amount p plist =
-  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
 
 let fold status player_num =
   status.players <-
