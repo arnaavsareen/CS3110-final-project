@@ -6,6 +6,8 @@ open Engine
 type decision =
   | Fold
   | Check
+  | Call
+  | Raise
 
 (*Make_decision makes a decision based on the current bet, cards in the
   community pool, and its own information*)
