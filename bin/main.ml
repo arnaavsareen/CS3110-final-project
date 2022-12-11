@@ -2,6 +2,7 @@ open Game
 open Author
 open Cards
 open Engine
+open Ai
 
 exception Unimplemented of string
 
@@ -32,20 +33,45 @@ let select () =
          "\n\nLet's begin the game!\n");
       ()
 
-let ai_bet info = ()
+(*flop_call draws x cards from the deck and adds them to the community pile. *)
+let flop_call x =
+  Engine.flop state x;
+  ()
 
+(*Cleanup advances state to the next game*)
+let cleanup =
+  Engine.cleanup state true;
+  ()
+
+(*Bet call preforms a single bet for the player*)
 let rec bet_call () =
   ANSITerminal.print_string [ ANSITerminal.magenta ]
     ("Current Bet is " ^ string_of_int state.current_bet);
   print_string "Would you like to check, raise, or fold?";
   match String.lowercase_ascii (read_line ()) with
-  | "check" -> ()
+  | "check" -> Engine.check state 0
   | "raise" -> ()
-  | "fold" -> ()
+  | "fold" -> Engine.fold state 0
   | _ ->
       print_string "Sorry, that is an invalid option. Please try again";
       bet_call ()
 
+let ai_bet player_number =
+  match
+    Ai.make_decision state.current_bet state.community_cards
+      (List.nth state.players player_number)
+  with
+  | Fold ->
+      Engine.fold state player_number;
+      ()
+  | Check ->
+      Engine.check state player_number;
+      ()
+  | Raise x ->
+      Engine.raise state player_number x;
+      ()
+
+(*Makes a bet, and checks if everyone is done betting.*)
 let rec bet x =
   if Engine.done_betting state then ()
   else if x = 0 then (
@@ -54,19 +80,35 @@ let rec bet x =
   else ai_bet x;
   Engine.increment state
 
+(* Tick is the function that advances the game state.e Tick calls functions that
+   print out the gui and mutate state. Ticks calls itself once its done.*)
 let rec tick () =
   match state.stage with
   | Begin ->
       select ();
+      Engine.deal state 2;
       tick ()
-  | First_Bet x -> raise (Unimplemented "no")
-  | Flop -> raise (Unimplemented "no")
-  | Second_Bet x -> raise (Unimplemented "no")
-  | Turn -> raise (Unimplemented "no")
-  | Third_Bet x -> raise (Unimplemented "no")
-  | River -> raise (Unimplemented "no")
-  | Final_Bet x -> raise (Unimplemented "no")
-  | Finish -> raise (Unimplemented "no")
+  | First_Bet x ->
+      bet_call ();
+      state.stage <- Flop;
+      tick ()
+  | Flop -> flop_call 3
+  | Second_Bet x ->
+      bet_call ();
+      state.stage <- Turn;
+      tick ()
+  | Turn -> flop_call 1
+  | Third_Bet x ->
+      bet_call ();
+      state.stage <- River;
+      tick ()
+  | River -> flop_call 1
+  | Final_Bet x ->
+      bet_call ();
+      state.stage <- Finish;
+      Engine.deal state 2;
+      tick ()
+  | Finish -> cleanup
 
 let rec playgame () =
   ANSITerminal.print_string [ ANSITerminal.magenta ]
@@ -140,7 +182,7 @@ let rec playgame () =
             "\n\nLet's begin the game!\n";
           print_string "You have been dealt two cards: ";
           print_string "\n";
-          print_string deal;
+          print_string "nothing here yet";
           print_string "\nEnter any key to see your cards!\n";
           print_string "> ";
           match read_line () with
@@ -154,7 +196,7 @@ let rec playgame () =
               | exception End_of_file -> ()
               | userchoice -> (
                   print_string "\n";
-                  print_string deal;
+                  print_string "nothing here yet";
                   print_string "\n";
                   print_string "The flop is has been dealt.\n";
                   print_string "\n";
