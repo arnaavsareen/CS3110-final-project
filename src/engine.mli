@@ -71,6 +71,7 @@ val raise_bet : game_state -> int -> int -> unit
 (*Parameters: current gamestate , the player number. fold: modifies the list of
   players removing the player at the player number index from the list and
   concats a new updated player with fold as true and returns unit*)
+
 val fold : game_state -> int -> unit
 
 (*Perameters: current gamestate , player number. check: if the check is invalid
