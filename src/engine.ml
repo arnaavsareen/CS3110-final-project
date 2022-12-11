@@ -100,8 +100,6 @@ let increment status =
       ()
   | _ -> raise Impossible
 
-(*checks to see if the bet is valid p is the player making bet plist is a list
-  of all players in the hand b is an integer value of the bet amount*)
 let valid_bet p plist b =
   if p.money = b then true (*all in*)
   else if b + p.bet < top_bet plist then false
@@ -109,9 +107,6 @@ let valid_bet p plist b =
   else if p.bet + b > top_bet plist && p.bet + b < 2 * top_bet plist then false
   else true
 
-(*if the bet is valid returns a player with bet and subtracts bet from money p
-  is the player making bet otherwise returns original player plist is a list of
-  all players in the hand b is an integer value of the bet amount*)
 let make_bet p plist b =
   if valid_bet p plist b then
     {
@@ -126,7 +121,7 @@ let make_bet p plist b =
 let rec list_remove x list =
   match list with
   | [] -> []
-  | h :: t -> if h = x then list_remove x t else list_remove x (h :: t)
+  | h :: t -> if h = x then list_remove x t else h :: list_remove x t
 
 let rec valid_check plist =
   match plist with
