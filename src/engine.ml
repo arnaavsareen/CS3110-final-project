@@ -41,6 +41,10 @@ type game_state = {
   mutable options : options;
 }
 
+exception Invalid_Bet of string
+exception Invalid_Check of string
+exception Invalid_Call of string
+
 let init_state =
   {
     stage = Begin;
@@ -55,16 +59,29 @@ let init_state =
 let advance_state x = ()
 let make_player name = { name; hand = []; money = 500; bet = 0; folded = false }
 
-let done_betting_helper playa current =
-  if playa.money = 0 then true else playa.money = current
+(*Returns the highest bet so far plist is a list of all the players in the
+  hand*)
+let rec top_bet plist =
+  match plist with
+  | [] -> 0
+  | h :: t -> Stdlib.max h.bet (top_bet t)
+
+(*retruns the amount it would take for the player to call*)
+let call_amount p plist =
+  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
+
+let rec done_betting_help plist =
+  match plist with
+  | [] -> true
+  | h :: t ->
+      if
+        (h.bet = call_amount h plist || h.folded = true || h.money = 0)
+        && done_betting_help t
+      then true
+      else false
 
 let done_betting status =
-  if status.current_bet = 0 then false
-  else
-    List.fold_left
-      (fun boolean playa ->
-        boolean && done_betting_helper playa status.current_bet)
-      true status.players
+  if status.current_bet = 0 then false else done_betting_help status.players
 
 let increment status =
   let n = List.length status.players in
@@ -82,13 +99,6 @@ let increment status =
       status.stage <- Final_Bet ((x + 1) mod n);
       ()
   | _ -> raise Impossible
-
-(*Returns the highest bet so far plist is a list of all the players in the
-  hand*)
-let rec top_bet plist =
-  match plist with
-  | [] -> 0
-  | h :: t -> Stdlib.max h.bet (top_bet t)
 
 (*checks to see if the bet is valid p is the player making bet plist is a list
   of all players in the hand b is an integer value of the bet amount*)
@@ -131,16 +141,23 @@ let fold status player_num =
     change_to_fold (List.nth status.players player_num)
     :: list_remove (List.nth status.players player_num) status.players
 
-let raise status player_num amount =
+let raise_bet status player_num amount =
   let p = List.nth status.players player_num in
   if make_bet p status.players amount != p then
     status.players <-
       make_bet p status.players amount :: list_remove p status.players
-  else failwith "Invalid bet" (*we can chenge this later*)
+  else raise (Invalid_Bet "Invalid bet")
+
+let call status player_num amount =
+  let p = List.nth status.players player_num in
+  if amount = call_amount p status.players then
+    status.players <-
+      make_bet p status.players amount :: list_remove p status.players
+  else raise (Invalid_Call "Invalid Call")
 
 let check status player_num =
   if valid_check status.players then ()
-  else failwith "Not allowed to check" (*we can chenge this later*)
+  else raise (Invalid_Check "invalid check")
 
 let deal status cards = status cards
 let flop status cards = status cards
@@ -155,10 +172,6 @@ type turn_order = player list
 type list_int = int list
 
 let next_turn x = ()
-
-(*retruns the amount it would take for the player to call*)
-let call_amount p plist =
-  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
 
 (*retruns true if there will be a side pot false otherwise*)
 let rec is_side_pot plist =
@@ -211,13 +224,17 @@ let rec total_pot_value plist =
   | [] -> 0
   | h :: t -> h.bet + total_pot_value t
 
-let rec main_pot_amount plist =
+let rec total_bet_amount plist =
   match plist with
   | [] -> 0
-  | h :: t -> h.bet + main_pot_amount t
+  | h :: t -> h.bet + total_bet_amount t
 
 let update_pot state =
-  state.pot <- { amount = main_pot_amount state.players; side_pots = [] }
+  state.pot <-
+    {
+      amount = state.pot.amount + total_bet_amount state.players;
+      side_pots = [];
+    }
 
 (* let set_bet = () *)
 
