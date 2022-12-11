@@ -90,10 +90,18 @@ let tyler =
     money = 1000;
     bet = 100;
     folded = false;
+    position = 0;
   }
 
 let arnaav =
-  { name = "arnaav"; hand = [ aH; aC ]; money = 0; bet = 90; folded = false }
+  {
+    name = "arnaav";
+    hand = [ aH; aC ];
+    money = 0;
+    bet = 90;
+    folded = false;
+    position = 1;
+  }
 
 let ryan =
   {
@@ -102,6 +110,7 @@ let ryan =
     money = 690;
     bet = 420;
     folded = false;
+    position = 2;
   }
 
 let eric =
@@ -111,6 +120,7 @@ let eric =
     money = 100;
     bet = 200;
     folded = false;
+    position = 3;
   }
 
 let big_man =
@@ -120,6 +130,7 @@ let big_man =
     money = 0;
     bet = 100;
     folded = false;
+    position = 4;
   }
 
 let plist = [ tyler; arnaav; ryan; eric ]
@@ -164,6 +175,7 @@ let tests =
              money = 680;
              bet = 420;
              folded = false;
+             position = 0;
            };
          is_side_pot_test "testing side pot  amount" plist true;
          fix_value_test "testing fix values" test_list [ 90; 10 ];
