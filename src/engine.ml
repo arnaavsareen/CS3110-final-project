@@ -94,6 +94,14 @@ let rec done_betting_help plist =
 let done_betting status =
   if status.iterated = false then false else done_betting_help status.players
 
+let rec players_in_hand plist =
+  match plist with
+  | [] -> 0
+  | h :: t -> if h.folded then players_in_hand t else 1 + players_in_hand t
+
+let done_round status =
+  if players_in_hand status.players = 1 then true else false
+
 let increment status =
   let n = List.length status.players in
   match status.stage with

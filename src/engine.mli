@@ -64,6 +64,9 @@ val done_betting : game_state -> bool
 (*helper function for done betting*)
 val done_betting_help : turn_order -> bool
 
+(*retruns true if only 1 player is in the hand false otherwise*)
+val done_round : game_state -> bool
+
 (*Raise,fold, and check update game state as appropriately.*)
 
 (*Parameters: current gamestate , the player number, and the bet you are making.

@@ -194,7 +194,7 @@ let tests =
              folded = false;
              position = 0;
            };
-         done_betting_help_test "testing if done" plist2 true
+         done_betting_help_test "testing if done" plist2 false
          (* is_side_pot_test "testing side pot amount" plist true;
             fix_value_test "testing fix values" test_list [ 90; 10 ];
             side_pot_list_test "testing side pot" plist [ 90 ];
