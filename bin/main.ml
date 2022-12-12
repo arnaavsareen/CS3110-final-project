@@ -132,15 +132,16 @@ let rec each_ai_turn state ai =
   | h :: t ->
       if done_betting state then ()
       else if h.folded then (
-        print_string ("\n" ^ h.name ^ " has folded so they do not get a turn\n");
-        print_string "Enter any key to move to the next players turn";
+        print_string
+          ("\n" ^ h.name ^ " has folded so they do not get a turn\n\n");
+        print_string "Enter any key to move to the next players turn\n>";
         match read_line () with
         | exception End_of_file -> ()
         | _ -> each_ai_turn state t)
       else (
         print_string ("\n" ^ h.name ^ " is making their turn\n");
         execute_aidecision state h;
-        print_string "Enter any key to move to the next players turn";
+        print_string "Enter any key to move to the next players turn\n>";
         match read_line () with
         | exception End_of_file -> ()
         | _ -> each_ai_turn state t)
@@ -162,10 +163,16 @@ let tick_next state =
 
 let tick_helper state =
   print_dealer ();
-  if done_betting state then () else bet_call ();
-  each_ai_turn state (ai_list state.players);
-  state.iterated <- true;
-  if done_betting state then tick_next state
+  if done_betting state then ()
+  else (
+    bet_call ();
+    print_string "Enter any key to move to the next players turn\n>";
+    match read_line () with
+    | exception End_of_file -> ()
+    | _ ->
+        each_ai_turn state (ai_list state.players);
+        state.iterated <- true;
+        if done_betting state then tick_next state)
 
 let rec tick2 () =
   match state.stage with
@@ -276,7 +283,7 @@ let rec playgame2 () =
       print_string
         "Fun Fact: TERA is an accronym for Tyler Eric Ryan Arnaav, the members \
          of our group.\n";
-      print_string "Enter the amount of players you want (Integer from 2-5)\n";
+      print_string "Enter the amount of players you want (Integer from 2-5)\n>";
       match read_line () with
       | exception End_of_file -> ()
       | userchoice -> (
