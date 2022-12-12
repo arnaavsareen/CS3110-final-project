@@ -23,14 +23,11 @@ type card = {
 }
 
 (*Deck is a represntation of a deck of cards*)
-type deck = card list
-
-(*shuffles a deck of cards*)
-val shuffler : deck -> deck
+type deck = { mutable cards : card list }
 
 (*Draws the top x cards, and crates a tuple (x,y), where x is the deck with top
   x cards removed and y is the drawn cards*)
-val draw : int -> deck -> deck * deck
+(* val draw : int -> deck -> deck * deck *)
 
 val suit_arr : suit array
 (**suit and number array are used in constructing new cards and pattern matching*)
@@ -47,17 +44,9 @@ val shuffle : 'a array -> 'a
 (**shuffles a deck of cards, given an array of cards*)
 
 val deal : string
-val overturn_deal : string
 
-val hidden_flop0_str : string
-(**Hidden flop are variables representing the ascii visual of the cards within
-   the console*)
-
-val hidden_flop1_str : string
-val hidden_flop2_str : string
-val hidden_flop3_str : string
-val hidden_flop4_str : string
-val flop_str : string
+(* Returns a record with a card list field of a randomly shuffled 52 card deck*)
+val init_shuffled_deck : card list
 
 module Hand : sig
   (*The type of the hand is one of the poker hands, and represents set of 5

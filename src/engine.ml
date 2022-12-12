@@ -20,14 +20,10 @@ type pot = {
 type options = { starting_money : int }
 
 type game_stage =
-  | Begin
-  | First_Bet of int
+  | Pre_Flop
   | Flop
-  | Second_Bet of int
   | Turn
-  | Third_Bet of int
   | River
-  | Final_Bet of int
   | Finish
 
 (* Game_state represesnts the state of the game, containing the stage, the
@@ -49,10 +45,10 @@ exception Invalid_Call of string
 
 let init_state =
   {
-    stage = Begin;
+    stage = Pre_Flop;
     players = [];
     pot = { amount = 0; side_pots = [] };
-    deck = [];
+    deck = init_shuffled_deck;
     community_cards = [];
     current_bet = 10;
     options = { starting_money = 0 };
@@ -94,6 +90,7 @@ let rec done_betting_help plist =
 let done_betting status =
   if status.iterated = false then false else done_betting_help status.players
 
+
 let rec players_in_hand plist =
   match plist with
   | [] -> 0
@@ -118,6 +115,7 @@ let increment status =
       status.stage <- Final_Bet ((x + 1) mod n);
       ()
   | _ -> raise Impossible
+
 
 let valid_bet p plist b =
   if p.money = b then true (*all in*)
@@ -310,3 +308,24 @@ let update_pot state =
 
 (*{ amount = main_pot_amount plist; side_pots = [] }*)
 (*testing*)
+
+let draw_card state =
+  let x = List.hd state.deck in
+  state.deck <- List.filter (fun c -> c <> x) state.deck;
+  x
+
+let deal_cards state =
+  state.players <-
+    List.map
+      (fun p -> { p with hand = [ draw_card state; draw_card state ] })
+      state.players
+
+let overturn_community_cards state =
+  state.community_cards <-
+    [
+      draw_card state;
+      draw_card state;
+      draw_card state;
+      draw_card state;
+      draw_card state;
+    ]

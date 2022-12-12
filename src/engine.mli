@@ -24,14 +24,10 @@ type options = { starting_money : int }
 (*Game_stage represnts the current stage of the game. Bet of int represents
   which player is betting right now.*)
 type game_stage =
-  | Begin
-  | First_Bet of int
+  | Pre_Flop
   | Flop
-  | Second_Bet of int
   | Turn
-  | Third_Bet of int
   | River
-  | Final_Bet of int
   | Finish
 
 (* Game_state represesnts the state of the game, containing the stage, the
@@ -97,9 +93,6 @@ val call : game_state -> int -> unit
   a new pot with the amount equal to the previous pot plus the sum of all the
   bets the players have made for that round and return unit*)
 val update_pot : game_state -> unit
-
-(*Incredments the state for whos betting*)
-val increment : game_state -> unit
 val next_turn : unit -> unit
 
 (*iterates through the list of players and returns the highest bet*)
@@ -126,5 +119,14 @@ val reset_bets : game_state -> unit
 val bet_list : turn_order -> int list
 val fix_values : int list -> int list
 
+
+(* Draw_card draws the top card of the deck and mutates the deck to no longer
+   contain that card*)
+val draw_card : game_state -> card
+val deal_cards : game_state -> unit
+val overturn_community_cards : game_state -> unit
+
+
 (*returns a list of the various pot amounts in order of precidence*)
 val pot_amounts : turn_order -> int list -> int list
+

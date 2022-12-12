@@ -5,6 +5,7 @@ open Ai
 open Engine
 open Tableui
 open Cards
+open Printer
 
 exception Unimplemented of string
 
@@ -90,13 +91,6 @@ let ai_bet plyr =
   | _ -> failwith "todo"
 
 (*Makes a bet, and checks if everyone is done betting.*)
-let rec bet x =
-  if Engine.done_betting state then ()
-  else if x = 0 then (
-    bet_call ();
-    Engine.increment state)
-  else ai_bet x;
-  Engine.increment state
 
 let rec execute_aidecision state p =
   let aidecision =
@@ -148,7 +142,7 @@ let rec each_ai_turn state ai =
 
 let next_stage state =
   match state.stage with
-  | Begin -> state.stage <- Flop
+  | Pre_Flop -> state.stage <- Flop
   | Flop -> state.stage <- Turn
   | Turn -> state.stage <- River
   | River -> state.stage <- Finish
@@ -161,7 +155,38 @@ let tick_next state =
   print_after_bet ();
   state.iterated <- false
 
-let tick_helper state =
+(* first_k_list k l Returns a list with only the first k elements of l Requires:
+   the length of l is greater or equal to k*)
+let rec first_k_list k l =
+  match k with
+  | 0 -> []
+  | n -> List.hd l :: first_k_list (k - 1) (List.tl l)
+
+let stage_value state =
+  match state.stage with
+  | Pre_Flop -> 2
+  | Flop -> 3
+  | Turn -> 4
+  | River -> 5
+  | Finish -> 6
+
+let pick_print_winner () =
+  if List.length state.players = 1 then print_string "You win the round!"
+  else
+    let player_hand_cards = (List.hd state.players).hand in
+    let ai_hand_cards = (List.nth state.players 1).hand in
+    let ai_hand = Hand.init_hand (ai_hand_cards @ state.deck) in
+    let player_hand = Hand.init_hand (player_hand_cards @ state.deck) in
+    match Hand.compare ai_hand player_hand with
+    | 0 -> print_string "It's a tie! \n"
+    | 1 -> print_string "TERA wins the round! \n"
+    | -1 -> print_string "Your hand was the best! You win the round! \n"
+    | _ -> failwith "not possible"
+
+let rec tick_helper state =
+  (if state.stage <> Pre_Flop then
+   let v = stage_value state in
+   Printer.print_cards (first_k_list v state.community_cards));
   print_dealer ();
   if done_betting state then ()
   else (
@@ -172,118 +197,45 @@ let tick_helper state =
     | _ ->
         each_ai_turn state (ai_list state.players);
         state.iterated <- true;
-        if done_betting state then tick_next state)
+        if done_betting state then tick_next state);
+  tick ()
 
-let rec tick2 () =
+and tick () =
   match state.stage with
-  | Begin ->
-      tick_helper state;
-      tick2 ()
-  | Flop ->
-      print_string hidden_flop3_str;
-      tick_helper state;
-      tick2 ()
-  | Turn ->
-      print_string hidden_flop4_str;
-      tick_helper state;
-      tick2 ()
-  | River ->
-      print_string flop_str;
-      tick_helper state;
-      tick2 ()
-  | Finish ->
-      if List.length state.players = 1 then print_string "You win the round!"
-      else
-        (* let player_hand_cards = (List.hd state.players).hand in let
-           ai_hand_cards = (List.nth state.players 1).hand in let ai_hand =
-           Hand.init_hand (ai_hand_cards @ state.deck) in let player_hand =
-           Hand.init_hand (player_hand_cards @ state.deck) in match Hand.compare
-           ai_hand player_hand with | 0 -> print_string "It's a tie!!" | 1 ->
-           print_string "TERA wins the round!!" | -1 -> print_string "You win
-           the round!!" | _ -> failwith "not possible") *)
-        print_string "Your hand was better! You win! \n"
-  | _ -> failwith "should not occur"
+  | Pre_Flop ->
+      Engine.overturn_community_cards state;
+      tick_helper state
+  | Flop -> tick_helper state
+  | Turn -> tick_helper state
+  | River -> tick_helper state
+  | Finish -> pick_print_winner ()
 
-let make_player_list plist pnum =
-  if pnum = 2 then Engine.make_player "TERA" 1 :: plist
+let make_player_list player pnum =
+  if pnum = 2 then player :: [ Engine.make_player "TERA" 1 ]
   else if pnum = 3 then
-    Engine.make_player "TERA" 1 :: Engine.make_player "Jerry" 2 :: plist
+    [ player; Engine.make_player "TERA" 1; Engine.make_player "Jerry" 2 ]
   else if pnum = 4 then
-    Engine.make_player "TERA" 1
-    :: Engine.make_player "Jerry" 2
-    :: Engine.make_player "Michael Clarkson" 3
-    :: plist
+    [
+      player;
+      Engine.make_player "TERA" 1;
+      Engine.make_player "Jerry" 2;
+      Engine.make_player "Michael Clarkson" 3;
+    ]
   else
-    Engine.make_player "TERA" 1
-    :: Engine.make_player "Jerry" 2
-    :: Engine.make_player "Michael Clarkson" 3
-    :: Engine.make_player "Clark Michaelson" 4
-    :: plist
+    [
+      player;
+      Engine.make_player "TERA" 1;
+      Engine.make_player "Jerry" 2;
+      Engine.make_player "Michael Clarkson" 3;
+      Engine.make_player "Clark Michaelson" 4;
+    ]
 
-let rec playgame2 () =
-  ANSITerminal.print_string [ ANSITerminal.magenta ]
-    " \n\
-    \     /$$$$$$   /$$$$$$   /$$$$$$  /$$$$$$ /$$   /$$  /$$$$$$       \n\
-    \    /$$__  $$ /$$__  $$ /$$__  $$|_  $$_/| $$$ | $$ /$$__  $$      \n\
-    \   | $$    _/| $$    $$| $$    _/  | $$  | $$$$| $$| $$    $$      \n\
-    \   | $$      | $$$$$$$$|  $$$$$$   | $$  | $$ $$ $$| $$  | $$      \n\
-    \   | $$      | $$__  $$   ___  $$  | $$  | $$  $$$$| $$  | $$      \n\
-    \   | $$    $$| $$  | $$ /$$    $$  | $$  | $$   $$$| $$  | $$      \n\
-    \   |  $$$$$$/| $$  | $$|  $$$$$$/ /$$$$$$| $$    $$|  $$$$$$/      \n\
-    \      _____/ |__/  |__/   _____/ |______/|__/    _/   _____/       \n\
-    \                                                                   \n\
-    \                                                                   \n\
-    \                                                                   ";
-  ANSITerminal.print_string [ ANSITerminal.magenta ]
-    " \n\
-    \     /$$$$$$  /$$$$$$        /$$$$$$$                         \n\
-    \    /$$__  $$/$$__  $$      | $$ __ $$                        \n\
-    \   | $$    _/ $$    _/      | $$    $$ / $$  / $$ /$$$$$$/$$$$\n\
-    \   | $$     |  $$$$$$       | $$$$$$$ | $$ | $$|  $$ _ $$ _ $$\n\
-    \   | $$        ___  $$      | $$ __ $$| $$ | $$|  $$   $$   $$\n\
-    \   | $$    $$/$$   $$       | $$   $$ | $$ | $$|  $$ | $$ | $$\n\
-    \   |  $$$$$$/  $$$$$$/      | $$$$$$$/| $$$$$$ /| $$ | $$ | $$\n\
-    \   |_______/   _____/       |_______/    _____/ |__/ |__/ |__/\n\
-    \                                                              \n\
-    \                                                              \n\
-    \                                                              ";
-  ANSITerminal.print_string [ ANSITerminal.white ]
-    "\n\
-     CS 3110 Final Project by Arnaav Sareen, Tyler Forstrom, Eric Yang, and \
-     Ryan Noonan\n";
-  ANSITerminal.print_string [ ANSITerminal.magenta ]
-    "\n\nAre you ready to play some poker today? (yes/no)\n";
-  print_string "Note: Do not enter a space after 'yes' or 'no'.\n";
-  print_string "> ";
+let rec playgame () =
+  Printer.print_intro ();
   match read_line () with
   | exception End_of_file -> ()
   | "yes" -> begin
-      ANSITerminal.(
-        print_string [ yellow ]
-          "Let's start by reviewing the rules of our game!\n\
-          \ \n\
-           We are going to be playing Texas Hold'em Poker (the most popular of \
-           all poker variations)\n\
-          \ > In a game of Texas hold'em, each player is dealt two cards face \
-           down (the 'hole cards')\n\
-          \ > Over several betting rounds, five more cards are (eventually) \
-           dealt face up in the middle of the table\n\
-          \ > These face-up cards are called the 'community cards.' Each \
-           player is free to use the community cards in combination with their \
-           hole cards to build a five-card poker hand.\n\
-          \ > Put simply, the person with the best hand wins. But there is a \
-           lot of strategy involved to be good at poker. A well known \
-           technique is 'bluffing'.\n\
-           credits: https://www.pokernews.com/poker-rules/texas-holdem.html \n\n");
-
-      ANSITerminal.print_string [ ANSITerminal.magenta ]
-        "\n\
-         This is a single player game where the user competes against an AI \
-         named TERA.\n";
-      print_string
-        "Fun Fact: TERA is an accronym for Tyler Eric Ryan Arnaav, the members \
-         of our group.\n";
-      print_string "Enter the amount of players you want (Integer from 2-5)\n>";
+      Printer.print_rules ();
       match read_line () with
       | exception End_of_file -> ()
       | userchoice -> (
@@ -299,26 +251,27 @@ let rec playgame2 () =
               let playerinputlst = String.split_on_char ' ' playername in
               let playerlst = List.filter (fun s -> s <> "") playerinputlst in
               let user = Engine.make_player playername 0 in
-              let plist = make_player_list [ user ] pnum in
+              let plist = make_player_list user pnum in
               state.players <- plist;
               ANSITerminal.print_string [ ANSITerminal.magenta ] "\nWelcome - ";
               print_list playerlst;
               ANSITerminal.print_string [ ANSITerminal.magenta ]
                 "\n\nLet's begin the game!\n\n";
               (* print_string (table playername); *)
-              print_string "\nBoth players have 500 chips each.\n";
+              print_string "\nEach player has 500 chips.\n";
               print_string deal;
               print_string "\nEnter any key to overturn your cards!\n";
               print_string "> ";
               match read_line () with
               | exception End_of_file -> failwith "error"
               | userchoice ->
-                  print_string overturn_deal;
+                  Engine.deal_cards state;
+                  Printer.print_cards (List.hd state.players).hand;
                   print_string "\nRemember your cards :))\n";
                   print_string
                     "\nOther players have also been dealt two cards.\n";
 
-                  tick2 ()))
+                  tick ()))
     end
   | "no" ->
       ANSITerminal.(
@@ -332,7 +285,7 @@ let rec playgame2 () =
       | "Q" ->
           ANSITerminal.print_string [ ANSITerminal.red ]
             "Quiting the game. See you next time :"
-      | "P" -> playgame2 ()
+      | "P" -> playgame ()
       | _ -> ())
 
-let () = playgame2 ()
+let () = playgame ()
