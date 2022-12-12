@@ -112,7 +112,10 @@ let rec execute_aidecision state p =
       try
         Engine.raise_bet state p.position r;
 
-        print_string (p.name ^ " has raised by " ^ string_of_int r ^ "\n\n")
+        print_string
+          (p.name ^ " has raised by "
+          ^ string_of_int (r - top_bet state.players)
+          ^ "\n\n")
       with e -> execute_aidecision state p)
   | Call ->
       Engine.call state p.position;
@@ -131,8 +134,12 @@ let rec each_ai_turn state ai =
   | [] -> ()
   | h :: t ->
       if done_betting state then ()
-      else if h.folded then
-        print_string ("\n" ^ h.name ^ " has folded so they do not get a turn\n")
+      else if h.folded then (
+        print_string ("\n" ^ h.name ^ " has folded so they do not get a turn\n");
+        print_string "Enter any key to move to the next players turn";
+        match read_line () with
+        | exception End_of_file -> ()
+        | _ -> each_ai_turn state t)
       else (
         print_string ("\n" ^ h.name ^ " is making their turn\n");
         execute_aidecision state h;
@@ -158,7 +165,7 @@ let tick_next state =
 
 let tick_helper state =
   print_dealer ();
-  bet_call ();
+  if done_betting state then () else bet_call ();
   each_ai_turn state (ai_list state.players);
   state.iterated <- true;
   if done_betting state then tick_next state

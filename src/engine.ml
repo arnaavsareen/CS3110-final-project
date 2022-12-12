@@ -142,7 +142,7 @@ let change_to_fold p =
     name = p.name;
     hand = p.hand;
     money = p.money;
-    bet = 0;
+    bet = p.bet;
     folded = true;
     position = p.position;
   }
@@ -154,6 +154,7 @@ let fold status player_num =
       :: list_remove (List.nth status.players player_num) status.players)
 
 let raise_bet status player_num amount =
+  status.players <- sort_list status.players;
   let p = List.nth status.players player_num in
   if make_bet p status.players amount != p then
     status.players <-
@@ -256,8 +257,9 @@ let rec reset_helper plist =
         position = p.position;
       }
       :: reset_helper t
-(* let rec print_bets plist = match plist with | [] -> "" | h :: t -> (h.name ^
-   " bet is " ^ string_of_int h.bet ^ "\n") ^ print_bets t*)
+
+(*let rec print_bets plist = match plist with | [] -> "" | h :: t -> (h.name ^ "
+  bet is " ^ string_of_int h.bet ^ "\n") ^ print_bets t*)
 
 let rec reset_bets status =
   status.players <- sort_list (reset_helper status.players)
