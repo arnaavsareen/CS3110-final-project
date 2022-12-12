@@ -219,15 +219,18 @@ let rec fix_values x =
 (*retruns a list of the vaious bet amounts of each sidepot ordered from lowest
   to highest*)
 
-let sort_int_list list = List.sort compare list
+let rec remove_dups list =
+  match list with
+  | [] -> []
+  | h :: t -> if List.mem h t then remove_dups t else h :: remove_dups t
 
-let rec side_pot_list plist =
+let sort_int_list list = List.sort compare (remove_dups list)
+
+let rec bet_list plist =
   if is_side_pot plist then
     match plist with
     | [] -> []
-    | h :: t ->
-        if all_in h = true then sort_int_list (h.bet :: side_pot_list t)
-        else side_pot_list t
+    | h :: t -> sort_int_list (h.bet :: bet_list t)
   else []
 
 let rec total_side_pot_player plist b =
@@ -246,11 +249,6 @@ let rec total_pot_value plist =
   match plist with
   | [] -> 0
   | h :: t -> h.bet + total_pot_value t
-
-let rec total_bet_amount plist =
-  match plist with
-  | [] -> 0
-  | h :: t -> h.bet + total_bet_amount t
 
 let rec reset_helper plist =
   match plist with
@@ -272,12 +270,53 @@ let rec reset_helper plist =
 let rec reset_bets status =
   status.players <- sort_list (reset_helper status.players)
 
+let rec main_pot_amount plist =
+  match plist with
+  | [] -> 0
+  | h :: t -> h.bet + main_pot_amount t
+
+let rec remove_pot_amount plist amount =
+  match plist with
+  | [] -> []
+  | p :: t ->
+      {
+        name = p.name;
+        bet = p.bet - amount;
+        hand = p.hand;
+        money = p.money;
+        folded = p.folded;
+        position = p.position;
+      }
+      :: remove_pot_amount t amount
+
+let rec total_pot_amount plist amount =
+  match plist with
+  | [] -> 0
+  | p :: t ->
+      if p.bet - amount >= 0 then amount + total_pot_amount t amount
+      else total_pot_amount t amount
+
+let rec pot_amounts plist sp_list =
+  match sp_list with
+  | [] -> []
+  | h :: t ->
+      total_pot_amount plist h :: pot_amounts (remove_pot_amount plist h) t
+
+let get_head = function
+  | h :: t -> h
+  | _ -> failwith "has no elements"
+
+let get_tail = function
+  | h :: t -> t
+  | _ -> failwith "has no elements"
+
 let update_pot state =
-  state.pot <-
-    {
-      amount = state.pot.amount + total_bet_amount state.players;
-      side_pots = [];
-    }
+  if is_side_pot state.players then
+    let pot_list =
+      pot_amounts state.players (fix_values (bet_list state.players))
+    in
+    state.pot <- { amount = get_head pot_list; side_pots = get_tail pot_list }
+  else state.pot <- { amount = main_pot_amount state.players; side_pots = [] }
 
 (* let set_bet = () *)
 

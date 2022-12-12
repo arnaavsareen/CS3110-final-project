@@ -58,7 +58,7 @@ let call_amount_test name player turn_order expected_output =
 let make_bet_test name player turn_order int expected_output =
   name >:: fun _ ->
   assert_equal expected_output (make_bet player turn_order int)
-    ~printer:(fun x -> x.name)
+    ~printer:(fun x -> string_of_int x.bet)
 
 let top_bet_test name turn_order expected_output =
   name >:: fun _ ->
@@ -68,9 +68,9 @@ let is_side_pot_test name turn_order expected_output =
   name >:: fun _ ->
   assert_equal expected_output (is_side_pot turn_order) ~printer:string_of_bool
 
-let side_pot_list_test name turn_order expected_output =
+let bet_list_test name turn_order expected_output =
   name >:: fun _ ->
-  assert_equal expected_output (side_pot_list turn_order) ~printer:(fun a ->
+  assert_equal expected_output (bet_list turn_order) ~printer:(fun a ->
       list_to_string string_of_int a)
 
 let fix_value_test name list_int expected_output =
@@ -78,9 +78,9 @@ let fix_value_test name list_int expected_output =
   assert_equal expected_output (fix_values list_int) ~printer:(fun a ->
       list_to_string string_of_int a)
 
-let total_side_pot_player_test name turn_order int expected_output =
+let pot_amounts_test name turn_order list_int expected_output =
   name >:: fun _ ->
-  assert_equal expected_output (total_side_pot_player turn_order int)
+  assert_equal expected_output (pot_amounts turn_order list_int)
     ~printer:(fun a -> list_to_string string_of_int a)
 
 let done_betting_help_test name turn_order expected_output =
@@ -94,7 +94,7 @@ let tyler =
     name = "tyler";
     hand = [ fourC; sevenH ];
     money = 1000;
-    bet = 100;
+    bet = 200;
     folded = false;
     position = 0;
   }
@@ -152,6 +152,8 @@ let fold_dude =
 let plist = [ tyler; arnaav; ryan; eric ]
 let plist1 = [ tyler; big_man; arnaav; ryan; eric ]
 let plist2 = [ tyler; big_man; arnaav; fold_dude ]
+let plist3 = [ tyler; big_man; arnaav; eric ]
+let plist4 = [ tyler; fold_dude; arnaav; eric ]
 let test_list = [ 90; 100 ]
 
 let tests =
@@ -182,23 +184,29 @@ let tests =
            "Four_of_a_kind 14, 13";
          top_bet_test "testing top bet" plist 420;
          call_amount_test "testing all in" eric plist 100;
-         call_amount_test "testing regular call" tyler plist 320;
+         call_amount_test "testing regular call" tyler plist 220;
          make_bet_test "testing bet over money" tyler plist 1100 tyler;
          make_bet_test "testing bet below top bet" tyler plist 100 tyler;
-         make_bet_test "testing valid bet" tyler plist 320
+         make_bet_test "testing valid bet" tyler plist 220
            {
              name = "tyler";
              hand = [ fourC; sevenH ];
-             money = 680;
+             money = 780;
              bet = 420;
              folded = false;
              position = 0;
            };
-         done_betting_help_test "testing if done" plist2 false
-         (* is_side_pot_test "testing side pot amount" plist true;
-            fix_value_test "testing fix values" test_list [ 90; 10 ];
-            side_pot_list_test "testing side pot" plist [ 90 ];
-            side_pot_list_test "testing side pot" plist1 [ 90; 10 ]; *);
+         done_betting_help_test "testing if done" plist2 true;
+         is_side_pot_test "testing side pot amount" plist true;
+         fix_value_test "testing fix values" test_list [ 90; 10 ];
+         bet_list_test "testing side pot" plist [ 90; 200 ];
+         bet_list_test "testing side pot" plist1 [ 90; 100; 200 ];
+         bet_list_test "testing sidepot" plist3 [ 90; 100; 200 ];
+         pot_amounts_test "testing pot amount" plist3 [ 90; 10; 100 ]
+           [ 360; 30; 200 ];
+         pot_amounts_test "testing combination" plist3
+           (fix_values (bet_list plist3))
+           [ 360; 30; 200 ];
        ]
 
 let _ = run_test_tt_main tests

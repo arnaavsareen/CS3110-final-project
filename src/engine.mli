@@ -123,6 +123,8 @@ val reset_bets : game_state -> unit
   to highest*)
 
 (*val side_pot_amount : turn_order -> int list*)
-val side_pot_list : turn_order -> int list
+val bet_list : turn_order -> int list
 val fix_values : int list -> int list
-val total_side_pot_player : turn_order -> int -> int list
+
+(*returns a list of the various pot amounts in order of precidence*)
+val pot_amounts : turn_order -> int list -> int list
