@@ -18,13 +18,12 @@ type card = {
   number : number;
 }
 
-type deck = card list
+type deck = { mutable cards : card list }
 
 let suit_arr = [| Hearts; Spades; Diamonds; Clubs |]
 
 let number_arr =
   [|
-    Number 1;
     Number 2;
     Number 3;
     Number 4;
@@ -40,25 +39,40 @@ let number_arr =
     Number 14;
   |]
 
-let rec make_fresh x y deck =
+let color_of_suit s =
+  match s with
+  | Clubs | Spades -> Black
+  | Diamonds | Hearts -> Red
+
+let rec make_fresh_helper x y deck =
   if x > 3 then deck
-  else if y > 13 then make_fresh (x + 1) 0 deck
+  else if y > 12 then make_fresh_helper (x + 1) 0 deck
   else
-    make_fresh x (y + 1)
-      ({ color = Red; suit = suit_arr.(x); number = number_arr.(y) } :: deck)
+    make_fresh_helper x (y + 1)
+      ({
+         color = color_of_suit suit_arr.(x);
+         suit = suit_arr.(x);
+         number = number_arr.(y);
+       }
+      :: deck)
+
+let init_unshuffled_deck = make_fresh_helper 0 0 []
 
 let shuffler d =
+  Random.self_init ();
   let nd = List.map (fun c -> (Random.bits (), c)) d in
   let sond = List.sort compare nd in
   List.map snd sond
+
+let init_shuffled_deck = shuffler init_unshuffled_deck
 
 let rec draw_helper x deck hand =
   match deck with
   | [] -> (deck, hand)
   | h :: t -> if x = 0 then (deck, hand) else draw_helper (x - 1) t (h :: hand)
 
-let draw x deck = draw_helper x deck []
-let fresh_deck = shuffler (make_fresh 0 0 [])
+(* let draw x deck = draw_helper x deck [] let fresh_deck = shuffler
+   (make_fresh_helper 0 0 []) *)
 
 let ascii_suit = function
   | Spades -> "♠"
@@ -77,17 +91,6 @@ let shuffle arr =
   Random.self_init ();
   Array.get arr (Random.int (Array.length arr))
 
-let num1 = str_number (shuffle number_arr)
-let suit1 = ascii_suit (shuffle suit_arr)
-let num2 = str_number (shuffle number_arr)
-let suit2 = ascii_suit (shuffle suit_arr)
-let num3 = str_number (shuffle number_arr)
-let suit3 = ascii_suit (shuffle suit_arr)
-let num4 = str_number (shuffle number_arr)
-let suit4 = ascii_suit (shuffle suit_arr)
-let num5 = str_number (shuffle number_arr)
-let suit5 = ascii_suit (shuffle suit_arr)
-
 let deal =
   let card1 = "      ┌─────────┐ ┌─────────┐         \n" in
   let card2 = "      │░░░░░░░░░│ │░░░░░░░░░│         \n" in
@@ -97,148 +100,6 @@ let deal =
   let card6 = "      │░░░░░░░░░│ │░░░░░░░░░│         \n" in
   let card7 = "      └─────────┘ └─────────┘         \n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
-
-let overturn_deal =
-  let num1 = str_number (shuffle number_arr) in
-  let suit1 = ascii_suit (shuffle suit_arr) in
-  let num2 = str_number (shuffle number_arr) in
-  let suit2 = ascii_suit (shuffle suit_arr) in
-  let card1 = "      ┌─────────┐ ┌─────────┐         \n" in
-  let card2 =
-    "      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │         \n"
-  in
-  let card3 = "      │         │ │         │         \n" in
-  let card4 =
-    "      │    " ^ suit1 ^ "    │ │    " ^ suit2 ^ "    │         \n"
-  in
-  let card5 = "      │         │ │         │         \n" in
-  let card6 = "      │         │ │         │         \n" in
-  let card7 = "      └─────────┘ └─────────┘         \n" in
-  card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
-
-let hidden_flop0_str =
-  let head1 = " ----------------------------------------------- \n" in
-  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
-  let card2 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card3 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card4 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card5 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card6 = "│      │░░░░░░░░░│ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
-  let tail1 = " ----------------------------------------------- \n" in
-  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ tail1
-
-let hidden_flop1_str =
-  let head1 = " ----------------------------------------------- \n" in
-  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
-  let card2 =
-    "│      │ " ^ num1 ^ "       │ │░░░░░░░░░│ │░░░░░░░░░│      │\n"
-  in
-  let card3 = "│      │         │ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card4 =
-    "│      │    " ^ suit1 ^ "    │ │░░░░░░░░░│ │░░░░░░░░░│      │\n"
-  in
-  let card5 = "│      │         │ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card6 = "│      │         │ │░░░░░░░░░│ │░░░░░░░░░│      │\n" in
-  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
-  let tail1 = " ----------------------------------------------- \n" in
-  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ tail1
-
-let hidden_flop2_str =
-  let head1 = " ----------------------------------------------- \n" in
-  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
-  let card2 =
-    "│      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │ │░░░░░░░░░│      │\n"
-  in
-  let card3 = "│      │         │ │         │ │░░░░░░░░░│      │\n" in
-  let card4 =
-    "│      │    " ^ suit1 ^ "    │ │    " ^ suit2
-    ^ "    │ │░░░░░░░░░│      │\n"
-  in
-  let card5 = "│      │         │ │         │ │░░░░░░░░░│      │\n" in
-  let card6 = "│      │         │ │         │ │░░░░░░░░░│      │\n" in
-  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
-  let tail1 = " ----------------------------------------------- \n" in
-  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ tail1
-
-let hidden_flop3_str =
-  let head1 = " ----------------------------------------------- \n" in
-  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
-  let card2 =
-    "│      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │ │ " ^ num3
-    ^ "       │      │\n"
-  in
-  let card3 = "│      │         │ │         │ │         │      │\n" in
-  let card4 =
-    "│      │    " ^ suit1 ^ "    │ │    " ^ suit2 ^ "    │ │    " ^ suit3
-    ^ "    │      │\n"
-  in
-  let card5 = "│      │         │ │         │ │         │      │\n" in
-  let card6 = "│      │         │ │         │ │         │      │\n" in
-  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
-  let tail1 = " ----------------------------------------------- \n" in
-  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ tail1
-
-let hidden_flop4_str =
-  let head1 = " ----------------------------------------------- \n" in
-  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
-  let card2 =
-    "│      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │ │ " ^ num3
-    ^ "       │      │\n"
-  in
-  let card3 = "│      │         │ │         │ │         │      │\n" in
-  let card4 =
-    "│      │    " ^ suit1 ^ "    │ │    " ^ suit2 ^ "    │ │    " ^ suit3
-    ^ "    │      │\n"
-  in
-  let card5 = "│      │         │ │         │ │         │      │\n" in
-  let card6 = "│      │         │ │         │ │         │      │\n" in
-  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
-  let card11 = "│      ┌─────────┐                              │\n" in
-  let card12 =
-    "│      │ " ^ num4 ^ "       │                              │\n"
-  in
-  let card13 = "│      │         │                              │\n" in
-  let card14 =
-    "│      │    " ^ suit4 ^ "    │                              │\n"
-  in
-  let card15 = "│      │         │                              │\n" in
-  let card16 = "│      │         │                              │\n" in
-  let card17 = "│      └─────────┘                              │\n" in
-  let tail1 = " ----------------------------------------------- \n" in
-  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ card11
-  ^ card12 ^ card13 ^ card14 ^ card15 ^ card16 ^ card17 ^ tail1
-
-let flop_str =
-  let head1 = " ----------------------------------------------- \n" in
-  let card1 = "│      ┌─────────┐ ┌─────────┐ ┌─────────┐      │\n" in
-  let card2 =
-    "│      │ " ^ num1 ^ "       │ │ " ^ num2 ^ "       │ │ " ^ num3
-    ^ "       │      │\n"
-  in
-  let card3 = "│      │         │ │         │ │         │      │\n" in
-  let card4 =
-    "│      │    " ^ suit1 ^ "    │ │    " ^ suit2 ^ "    │ │    " ^ suit3
-    ^ "    │      │\n"
-  in
-  let card5 = "│      │         │ │         │ │         │      │\n" in
-  let card6 = "│      │         │ │         │ │         │      │\n" in
-  let card7 = "│      └─────────┘ └─────────┘ └─────────┘      │\n" in
-  let card11 = "│      ┌─────────┐ ┌─────────┐                  │\n" in
-  let card12 =
-    "│      │ " ^ num4 ^ "       │ │ " ^ num5 ^ "       │                  │\n"
-  in
-  let card13 = "│      │         │ │         │                  │\n" in
-  let card14 =
-    "│      │    " ^ suit4 ^ "    │ │    " ^ suit5
-    ^ "    │                  │\n"
-  in
-  let card15 = "│      │         │ │         │                  │\n" in
-  let card16 = "│      │         │ │         │                  │\n" in
-  let card17 = "│      └─────────┘ └─────────┘                  │\n" in
-  let tail1 = " ----------------------------------------------- \n" in
-  head1 ^ card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7 ^ card11
-  ^ card12 ^ card13 ^ card14 ^ card15 ^ card16 ^ card17 ^ tail1
 
 module Hand = struct
   type t =
