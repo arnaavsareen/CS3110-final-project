@@ -86,10 +86,9 @@ let rec done_betting_help plist =
   match plist with
   | [] -> true
   | h :: t ->
-      if
-        (call_amount h plist = 0 || h.folded = true || h.money = 0)
-        && done_betting_help t
-      then true
+      if h.bet = top_bet plist then true && done_betting_help t
+      else if h.folded = true then true && done_betting_help t
+      else if h.money = 0 then true && done_betting_help t
       else false
 
 let done_betting status =

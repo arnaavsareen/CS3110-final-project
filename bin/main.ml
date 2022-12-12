@@ -151,8 +151,8 @@ let next_stage state =
 
 let tick_next state =
   next_stage state;
-  reset_bets state;
   update_pot state;
+  reset_bets state;
   print_after_bet ();
   state.iterated <- false
 
