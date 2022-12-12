@@ -60,6 +60,9 @@ val done_betting : game_state -> bool
 (*helper function for done betting*)
 val done_betting_help : turn_order -> bool
 
+(*retruns true if only 1 player is in the hand false otherwise*)
+val done_round : game_state -> bool
+
 (*Raise,fold, and check update game state as appropriately.*)
 
 (*Parameters: current gamestate , the player number, and the bet you are making.
@@ -113,12 +116,17 @@ val reset_bets : game_state -> unit
   to highest*)
 
 (*val side_pot_amount : turn_order -> int list*)
-val side_pot_list : turn_order -> int list
+val bet_list : turn_order -> int list
 val fix_values : int list -> int list
-val total_side_pot_player : turn_order -> int -> int list
+
 
 (* Draw_card draws the top card of the deck and mutates the deck to no longer
    contain that card*)
 val draw_card : game_state -> card
 val deal_cards : game_state -> unit
 val overturn_community_cards : game_state -> unit
+
+
+(*returns a list of the various pot amounts in order of precidence*)
+val pot_amounts : turn_order -> int list -> int list
+
