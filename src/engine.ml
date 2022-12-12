@@ -254,6 +254,8 @@ let rec reset_helper plist =
         position = p.position;
       }
       :: reset_helper t
+(* let rec print_bets plist = match plist with | [] -> "" | h :: t -> (h.name ^
+   " bet is " ^ string_of_int h.bet ^ "\n") ^ print_bets t*)
 
 let rec reset_bets status = status.players <- reset_helper status.players
 

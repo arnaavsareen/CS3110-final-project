@@ -104,7 +104,7 @@ let rec execute_aidecision state p =
   in
   match aidecision with
   | Fold ->
-      print_string (p.name ^ "decided to fold\n\n");
+      print_string (p.name ^ " decided to fold\n\n");
       Engine.fold state p.position
   | Check -> ()
   | Raise -> (
@@ -129,16 +129,17 @@ let ai_list plist =
 let rec each_ai_turn state ai =
   match ai with
   | [] -> ()
-  | h :: t -> (
+  | h :: t ->
       if done_betting state then ()
       else if h.folded then
-        print_string ("\n" ^ h.name ^ " has folded so they do not get a turn")
-      else print_string ("\n" ^ h.name ^ " is making their turn\n");
-      execute_aidecision state h;
-      print_string "Enter any key to move to the next players turn";
-      match read_line () with
-      | exception End_of_file -> ()
-      | _ -> each_ai_turn state t)
+        print_string ("\n" ^ h.name ^ " has folded so they do not get a turn\n")
+      else (
+        print_string ("\n" ^ h.name ^ " is making their turn\n");
+        execute_aidecision state h;
+        print_string "Enter any key to move to the next players turn";
+        match read_line () with
+        | exception End_of_file -> ()
+        | _ -> each_ai_turn state t)
 
 let next_stage state =
   match state.stage with
