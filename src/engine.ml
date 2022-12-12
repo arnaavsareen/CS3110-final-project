@@ -233,18 +233,6 @@ let rec bet_list plist =
     | h :: t -> sort_int_list (h.bet :: bet_list t)
   else []
 
-let rec total_side_pot_player plist b =
-  match plist with
-  | [] -> []
-  | h :: t ->
-      if h.bet > b then b :: total_side_pot_player t b
-      else total_side_pot_player t b
-
-let rec sum_list l =
-  match l with
-  | [] -> 0
-  | h :: t -> h + sum_list t
-
 let rec total_pot_value plist =
   match plist with
   | [] -> 0
