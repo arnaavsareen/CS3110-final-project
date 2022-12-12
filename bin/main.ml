@@ -169,48 +169,42 @@ let rec execute_aidecision state =
         ^ string_of_int (List.nth state.players 1).bet
         ^ "\n")
 
+let next_stage state =
+  match state.stage with
+  | Begin -> state.stage <- Flop
+  | Flop -> state.stage <- Turn
+  | Turn -> state.stage <- River
+  | River -> state.stage <- Finish
+  | _ -> ()
+
+let tick_next state =
+  next_stage state;
+  update_pot state;
+  reset_bets state;
+  print_after_bet ()
+
+let tick_helper state =
+  print_dealer ();
+  bet_call ();
+  execute_aidecision state;
+  if done_betting state then tick_next state
+
 let rec tick2 () =
   match state.stage with
   | Begin ->
-      print_dealer ();
-      bet_call ();
-      execute_aidecision state;
-      update_pot state;
-      reset_bets state;
-      print_after_bet ();
-      state.stage <- Flop;
+      tick_helper state;
       tick2 ()
   | Flop ->
       print_string hidden_flop3_str;
-      print_dealer ();
-      bet_call ();
-      execute_aidecision state;
-      update_pot state;
-      reset_bets state;
-      print_after_bet ();
-      state.stage <- Turn;
+      tick_helper state;
       tick2 ()
   | Turn ->
       print_string hidden_flop4_str;
-      print_dealer ();
-
-      bet_call ();
-      execute_aidecision state;
-      update_pot state;
-      reset_bets state;
-      print_after_bet ();
-      state.stage <- River;
+      tick_helper state;
       tick2 ()
   | River ->
       print_string flop_str;
-      print_dealer ();
-
-      bet_call ();
-      execute_aidecision state;
-      update_pot state;
-      reset_bets state;
-      print_after_bet ();
-      state.stage <- Finish;
+      tick_helper state;
       tick2 ()
   | Finish ->
       if List.length state.players = 1 then print_string "You win the round!"
