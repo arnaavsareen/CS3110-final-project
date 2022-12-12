@@ -183,21 +183,6 @@ type deck = card list
 type turn_order = player list
 type list_int = int list
 
-let rec reset_helper plist =
-  match plist with
-  | [] -> []
-  | p :: t ->
-      {
-        name = p.name;
-        hand = p.hand;
-        money = p.money;
-        bet = 0;
-        folded = p.folded;
-        position = p.position;
-      }
-      :: reset_helper t
-
-let rec reset_bets status = status.players <- reset_helper status.players
 let next_turn x = ()
 
 (*retruns true if there will be a side pot false otherwise*)
@@ -256,6 +241,22 @@ let rec total_bet_amount plist =
   match plist with
   | [] -> 0
   | h :: t -> h.bet + total_bet_amount t
+
+let rec reset_helper plist =
+  match plist with
+  | [] -> []
+  | p :: t ->
+      {
+        name = p.name;
+        hand = p.hand;
+        money = p.money;
+        bet = 0;
+        folded = p.folded;
+        position = p.position;
+      }
+      :: reset_helper t
+
+let rec reset_bets status = status.players <- reset_helper status.players
 
 let update_pot state =
   state.pot <-

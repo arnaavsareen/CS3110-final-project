@@ -55,22 +55,17 @@ let print_dealer () =
   print_string "1. To check, type in 'check'\n";
   print_string "2. To raise, type in 'raise'\n";
   print_string "3. To fold, type in 'fold'\n";
-  print_string "4. To call, type in 'call'\n";
-  print_string "> "
+  print_string "4. To call, type in 'call'\n"
 
 (*Bet call preforms a single bet for the player*)
 let rec bet_call () =
-  print_string
-    ("You have "
-    ^ string_of_int (List.hd state.players).money
-    ^ " money left" ^ "\n");
-  print_dealer ();
+  print_string "\n>";
   match read_line () with
   | "check" -> (
       try Engine.check state 0
       with e ->
         print_string
-          "Sorry, that bet is invalid, enter raise check or fold again: ";
+          "Sorry, that bet is invalid, enter raise check or fold again: \n";
         bet_call ())
   | "raise" -> (
       print_string
@@ -82,7 +77,7 @@ let rec bet_call () =
       try Engine.raise_bet state 0 amount
       with e ->
         print_string
-          "Sorry, that bet is invalid, enter raise check or fold again: ";
+          "Sorry, that bet is invalid, enter raise check or fold again: \n";
         bet_call ())
   | "fold" ->
       ANSITerminal.print_string [ ANSITerminal.green ] "\nTERA WINS!!!\n";
@@ -91,6 +86,14 @@ let rec bet_call () =
   | _ ->
       ANSITerminal.print_string [ ANSITerminal.red ] "\nWrong input!";
       exit 0
+
+let print_after_bet () =
+  print_string
+    ("\nYou have "
+    ^ string_of_int (List.hd state.players).money
+    ^ " money left" ^ "\n");
+  print_string ("The total pot is: " ^ string_of_int state.pot.amount ^ "\n");
+  ()
 
 let ai_bet plyr =
   match Ai.make_decision state.current_bet state.community_cards with
@@ -148,7 +151,7 @@ let execute_aidecision state =
   in
   match aidecision with
   | Fold ->
-      print_string "TERA, folded, You win!";
+      print_string "\nTERA, folded, You win!";
       exit 0
   | Check -> ()
   | Raise ->
@@ -158,7 +161,7 @@ let execute_aidecision state =
   | Call ->
       Engine.call state 1;
       print_string
-        ("Tera has called, to put his bet at a total of "
+        ("\nTera has called, to put his bet at a total of "
         ^ string_of_int (List.nth state.players 1).bet
         ^ "\n")
 
@@ -167,27 +170,42 @@ let rec tick2 () =
   | Begin ->
       bet_call ();
       execute_aidecision state;
+      update_pot state;
+      reset_bets state;
+      print_after_bet ();
       state.stage <- Flop;
       tick2 ()
   | Flop ->
       print_string hidden_flop3_str;
+      print_dealer ();
 
       bet_call ();
       execute_aidecision state;
+      update_pot state;
+      reset_bets state;
+      print_after_bet ();
       state.stage <- Turn;
       tick2 ()
   | Turn ->
-      print_string hidden_flop2_str;
+      print_string hidden_flop4_str;
+      print_dealer ();
 
       bet_call ();
       execute_aidecision state;
+      update_pot state;
+      reset_bets state;
+      print_after_bet ();
       state.stage <- River;
       tick2 ()
   | River ->
       print_string flop_str;
+      print_dealer ();
 
       bet_call ();
       execute_aidecision state;
+      update_pot state;
+      reset_bets state;
+      print_after_bet ();
       state.stage <- Finish;
       tick2 ()
   | Finish ->
@@ -313,14 +331,14 @@ let rec playgame () =
               match read_line () with
               | userchoice -> (
                   print_string overturn_deal;
-                  print_string "\nRemember your cards :))\n";
-                  print_string "\nTERA has also been dealt two cards.\n";
-                  print_string "It is time to bet now! You will go first.\n";
-                  print_string "\nYou have three options -\n";
-                  print_string "1. To check, type in 'check'\n";
-                  print_string "2. To raise, type in 'raise'\n";
-                  print_string "3. To fold, type in 'fold'\n";
-                  print_string "> ";
+                  print_string
+                    ("\nRemember your cards :))\n"
+                   ^ "\nTERA has also been dealt two cards.\n"
+                   ^ "It is time to bet now! You will go first.\n"
+                   ^ "\nYou have three options -\n"
+                   ^ "1. To check, type in 'check'\n"
+                   ^ "2. To raise, type in 'raise'\n"
+                   ^ "3. To fold, type in 'fold'\n" ^ "> ");
                   (match read_line () with
                   | "check" -> Engine.check state 0
                   | "raise" ->
@@ -480,6 +498,7 @@ let rec playgame2 () =
           print_string overturn_deal;
           print_string "\nRemember your cards :))\n";
           print_string "\nTERA has also been dealt two cards.\n";
+          print_dealer ();
 
           tick2 ())
 
