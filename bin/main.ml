@@ -112,10 +112,7 @@ let rec execute_aidecision state p =
       try
         Engine.raise_bet state p.position r;
 
-        print_string
-          (p.name ^ " has raised by "
-          ^ string_of_int (r - top_bet state.players)
-          ^ "\n\n")
+        print_string (p.name ^ " has raised to " ^ string_of_int r ^ "\n\n")
       with e -> execute_aidecision state p)
   | Call ->
       Engine.call state p.position;
