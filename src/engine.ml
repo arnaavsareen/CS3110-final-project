@@ -90,7 +90,6 @@ let rec done_betting_help plist =
 let done_betting status =
   if status.iterated = false then false else done_betting_help status.players
 
-
 let rec players_in_hand plist =
   match plist with
   | [] -> 0
@@ -98,24 +97,6 @@ let rec players_in_hand plist =
 
 let done_round status =
   if players_in_hand status.players = 1 then true else false
-
-let increment status =
-  let n = List.length status.players in
-  match status.stage with
-  | First_Bet x ->
-      status.stage <- First_Bet ((x + 1) mod n);
-      ()
-  | Second_Bet x ->
-      status.stage <- Second_Bet ((x + 1) mod n);
-      ()
-  | Third_Bet x ->
-      status.stage <- Third_Bet ((x + 1) mod n);
-      ()
-  | Final_Bet x ->
-      status.stage <- Final_Bet ((x + 1) mod n);
-      ()
-  | _ -> raise Impossible
-
 
 let valid_bet p plist b =
   if p.money = b then true (*all in*)
