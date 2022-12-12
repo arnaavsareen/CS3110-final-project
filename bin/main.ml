@@ -51,11 +51,12 @@ let rec buyin_call p plist b = make_bet p plist 10
 (*Prints what the dealer says to the player everytime before the player gets a
   chance to bet*)
 let print_dealer () =
-  print_string "\nYou have three options -\n";
+  print_string "\nYou have four options -\n";
   (*print_string "1. To check, type in 'check'\n";*)
   print_string "1. To raise, type in 'raise'\n";
   print_string "2. To fold, type in 'fold'\n";
-  print_string "3. To call, type in 'call'\n"
+  print_string "3. To call, type in 'call'\n";
+  print_string "4. To check, type in 'check'\n"
 
 (*Bet call preforms a single bet for the player*)
 let rec bet_call () =
@@ -171,6 +172,7 @@ let rec execute_aidecision state =
 let rec tick2 () =
   match state.stage with
   | Begin ->
+      print_dealer ();
       bet_call ();
       execute_aidecision state;
       update_pot state;
@@ -192,7 +194,6 @@ let rec tick2 () =
       print_string hidden_flop4_str;
       print_dealer ();
 
-      print_string hidden_flop4_str;
       bet_call ();
       execute_aidecision state;
       update_pot state;
