@@ -40,6 +40,7 @@ type game_state = {
   mutable community_cards : card list;
   mutable current_bet : int;
   mutable options : options;
+  mutable iterated : bool;
 }
 
 exception Invalid_Bet of string
@@ -55,6 +56,7 @@ let init_state =
     community_cards = [];
     current_bet = 10;
     options = { starting_money = 0 };
+    iterated = false;
   }
 
 let advance_state x = ()
@@ -88,7 +90,8 @@ let rec done_betting_help plist =
       then true
       else false
 
-let done_betting status = done_betting_help status.players
+let done_betting status =
+  if status.iterated = false then false else done_betting_help status.players
 
 let increment status =
   let n = List.length status.players in
@@ -131,10 +134,7 @@ let rec list_remove x list =
   | [] -> []
   | h :: t -> if h = x then list_remove x t else h :: list_remove x t
 
-let rec valid_check plist =
-  match plist with
-  | [] -> true
-  | h :: t -> if h.bet > 0 then false else valid_check t
+let rec valid_check plist p = if p.bet = top_bet plist then true else false
 
 let change_to_fold p =
   {
@@ -167,7 +167,7 @@ let call status player_num =
     sort_list (make_bet p status.players call_am :: list_remove p status.players)
 
 let check status player_num =
-  if valid_check status.players then ()
+  if valid_check status.players (List.nth status.players player_num) then ()
   else raise (Invalid_Check "invalid check")
 
 let deal status cards = status cards

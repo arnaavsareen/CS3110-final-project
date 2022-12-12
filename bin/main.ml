@@ -159,6 +159,7 @@ let tick_helper state =
   print_dealer ();
   bet_call ();
   each_ai_turn state (ai_list state.players);
+  state.iterated <- true;
   if done_betting state then tick_next state
 
 let rec tick2 () =

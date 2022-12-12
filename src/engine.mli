@@ -44,6 +44,7 @@ type game_state = {
   mutable community_cards : card list;
   mutable current_bet : int;
   mutable options : options;
+  mutable iterated : bool;
 }
 
 type turn_order = player list
@@ -80,7 +81,7 @@ val fold : game_state -> int -> unit
 
 (*Perameters: current gamestate , player number. check: if the check is invalid
   then it raises the Invalid_Check exception otherwise it returns unit*)
-val check : game_state -> 'a -> unit
+val check : game_state -> int -> unit
 
 (*Parameters: current gamestate , the player number, and the bet you are making.
   call: if the call is valid it modifies the list of players removing the player
