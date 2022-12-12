@@ -78,14 +78,16 @@ let rec top_bet plist =
   | h :: t -> Stdlib.max h.bet (top_bet t)
 
 let call_amount p plist =
-  if p.money + p.bet < top_bet plist then p.money else top_bet plist - p.bet
+  if p.money + p.bet < top_bet plist then p.money
+  else if p.bet = top_bet plist then 0
+  else top_bet plist - p.bet
 
 let rec done_betting_help plist =
   match plist with
   | [] -> true
   | h :: t ->
       if
-        (h.bet = call_amount h plist || h.folded = true || h.money = 0)
+        (call_amount h plist = 0 || h.folded = true || h.money = 0)
         && done_betting_help t
       then true
       else false
@@ -167,7 +169,8 @@ let call status player_num =
     sort_list (make_bet p status.players call_am :: list_remove p status.players)
 
 let check status player_num =
-  if valid_check status.players (List.nth status.players player_num) then ()
+  if valid_check status.players (List.nth status.players player_num) then
+    status.players <- sort_list status.players
   else raise (Invalid_Check "invalid check")
 
 let deal status cards = status cards
@@ -257,7 +260,8 @@ let rec reset_helper plist =
 (* let rec print_bets plist = match plist with | [] -> "" | h :: t -> (h.name ^
    " bet is " ^ string_of_int h.bet ^ "\n") ^ print_bets t*)
 
-let rec reset_bets status = status.players <- reset_helper status.players
+let rec reset_bets status =
+  status.players <- sort_list (reset_helper status.players)
 
 let update_pot state =
   state.pot <-

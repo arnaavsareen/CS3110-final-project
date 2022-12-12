@@ -112,7 +112,7 @@ let rec execute_aidecision state p =
       try
         Engine.raise_bet state p.position r;
 
-        print_string (p.name ^ " has raised to " ^ string_of_int r ^ "\n\n")
+        print_string (p.name ^ " has raised by " ^ string_of_int r ^ "\n\n")
       with e -> execute_aidecision state p)
   | Call ->
       Engine.call state p.position;
@@ -151,9 +151,10 @@ let next_stage state =
 
 let tick_next state =
   next_stage state;
-  update_pot state;
   reset_bets state;
-  print_after_bet ()
+  update_pot state;
+  print_after_bet ();
+  state.iterated <- false
 
 let tick_helper state =
   print_dealer ();
