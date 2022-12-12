@@ -176,11 +176,11 @@ let tests =
              bet = 420;
              folded = false;
              position = 0;
-           };
-         is_side_pot_test "testing side pot  amount" plist true;
-         fix_value_test "testing fix values" test_list [ 90; 10 ];
-         side_pot_list_test "testing side pot" plist [ 90 ];
-         side_pot_list_test "testing side pot" plist1 [ 90; 10 ];
+           }
+         (* is_side_pot_test "testing side pot amount" plist true;
+            fix_value_test "testing fix values" test_list [ 90; 10 ];
+            side_pot_list_test "testing side pot" plist [ 90 ];
+            side_pot_list_test "testing side pot" plist1 [ 90; 10 ]; *);
        ]
 
 let _ = run_test_tt_main tests

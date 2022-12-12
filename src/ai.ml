@@ -10,4 +10,4 @@ type decision =
 
 let make_decision bet pool =
   let rando = Random.int 100 in
-  if rando > 100 then Fold else Call
+  if rando > 90 then Fold else if rando > 50 then Call else Raise

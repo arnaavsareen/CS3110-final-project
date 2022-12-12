@@ -52,10 +52,10 @@ let rec buyin_call p plist b = make_bet p plist 10
   chance to bet*)
 let print_dealer () =
   print_string "\nYou have three options -\n";
-  print_string "1. To check, type in 'check'\n";
-  print_string "2. To raise, type in 'raise'\n";
-  print_string "3. To fold, type in 'fold'\n";
-  print_string "4. To call, type in 'call'\n"
+  (*print_string "1. To check, type in 'check'\n";*)
+  print_string "1. To raise, type in 'raise'\n";
+  print_string "2. To fold, type in 'fold'\n";
+  print_string "3. To call, type in 'call'\n"
 
 (*Bet call preforms a single bet for the player*)
 let rec bet_call () =
@@ -145,7 +145,7 @@ let rec tick () =
       tick ()
   | Finish -> failwith "sorry i forget what you had here deleted by accident"
 
-let execute_aidecision state =
+let rec execute_aidecision state =
   let aidecision =
     Ai.make_decision state.current_bet (List.nth state.players 1).hand
   in
@@ -154,10 +154,13 @@ let execute_aidecision state =
       print_string "\nTERA, folded, You win!";
       exit 0
   | Check -> ()
-  | Raise ->
+  | Raise -> (
       let r = Engine.top_bet state.players * 2 in
-      print_string ("TERA has raised by " ^ string_of_int r ^ "\n");
-      Engine.raise_bet state 1 r
+      try
+        Engine.raise_bet state 1 r;
+
+        print_string ("TERA has raised by " ^ string_of_int r ^ "\n")
+      with e -> execute_aidecision state)
   | Call ->
       Engine.call state 1;
       print_string
@@ -178,7 +181,6 @@ let rec tick2 () =
   | Flop ->
       print_string hidden_flop3_str;
       print_dealer ();
-
       bet_call ();
       execute_aidecision state;
       update_pot state;
@@ -190,6 +192,7 @@ let rec tick2 () =
       print_string hidden_flop4_str;
       print_dealer ();
 
+      print_string hidden_flop4_str;
       bet_call ();
       execute_aidecision state;
       update_pot state;
@@ -470,36 +473,114 @@ let rec playgame () =
       | _ -> ())
 
 let rec playgame2 () =
-  print_string "Enter your player name.\n";
-  print_string "Example: Arnaav; Example Tyler; Example Ryan; Example: Eric\n";
+  ANSITerminal.print_string [ ANSITerminal.magenta ]
+    " \n\
+    \     /$$$$$$   /$$$$$$   /$$$$$$  /$$$$$$ /$$   /$$  /$$$$$$       \n\
+    \    /$$__  $$ /$$__  $$ /$$__  $$|_  $$_/| $$$ | $$ /$$__  $$      \n\
+    \   | $$    _/| $$    $$| $$    _/  | $$  | $$$$| $$| $$    $$      \n\
+    \   | $$      | $$$$$$$$|  $$$$$$   | $$  | $$ $$ $$| $$  | $$      \n\
+    \   | $$      | $$__  $$   ___  $$  | $$  | $$  $$$$| $$  | $$      \n\
+    \   | $$    $$| $$  | $$ /$$    $$  | $$  | $$   $$$| $$  | $$      \n\
+    \   |  $$$$$$/| $$  | $$|  $$$$$$/ /$$$$$$| $$    $$|  $$$$$$/      \n\
+    \      _____/ |__/  |__/   _____/ |______/|__/    _/   _____/       \n\
+    \                                                                   \n\
+    \                                                                   \n\
+    \                                                                   ";
+  ANSITerminal.print_string [ ANSITerminal.magenta ]
+    " \n\
+    \     /$$$$$$  /$$$$$$        /$$$$$$$                         \n\
+    \    /$$__  $$/$$__  $$      | $$ __ $$                        \n\
+    \   | $$    _/ $$    _/      | $$    $$ / $$  / $$ /$$$$$$/$$$$\n\
+    \   | $$     |  $$$$$$       | $$$$$$$ | $$ | $$|  $$ _ $$ _ $$\n\
+    \   | $$        ___  $$      | $$ __ $$| $$ | $$|  $$   $$   $$\n\
+    \   | $$    $$/$$   $$       | $$   $$ | $$ | $$|  $$ | $$ | $$\n\
+    \   |  $$$$$$/  $$$$$$/      | $$$$$$$/| $$$$$$ /| $$ | $$ | $$\n\
+    \   |_______/   _____/       |_______/    _____/ |__/ |__/ |__/\n\
+    \                                                              \n\
+    \                                                              \n\
+    \                                                              ";
+  ANSITerminal.print_string [ ANSITerminal.white ]
+    "\n\
+     CS 3110 Final Project by Arnaav Sareen, Tyler Forstrom, Eric Yang, and \
+     Ryan Noonan\n";
+  ANSITerminal.print_string [ ANSITerminal.magenta ]
+    "\n\nAre you ready to play some poker today? (yes/no)\n";
+  print_string "Note: Do not enter a space after 'yes' or 'no'.\n";
   print_string "> ";
   match read_line () with
   | exception End_of_file -> ()
-  | userchoice -> (
-      let playername = userchoice ^ " " in
-      let playerinputlst = String.split_on_char ' ' playername in
-      let playerlst = List.filter (fun s -> s <> "") playerinputlst in
-      let user = Engine.make_player playername in
-      let tera = Engine.make_player "TERA" in
-      let plist = [ user; tera ] in
-      state.players <- plist;
-      ANSITerminal.print_string [ ANSITerminal.magenta ] "\nWelcome - ";
-      print_list playerlst;
+  | "yes" -> begin
+      ANSITerminal.(
+        print_string [ yellow ]
+          "Let's start by reviewing the rules of our game!\n\
+          \ \n\
+           We are going to be playing Texas Hold'em Poker (the most popular of \
+           all poker variations)\n\
+          \ > In a game of Texas hold'em, each player is dealt two cards face \
+           down (the 'hole cards')\n\
+          \ > Over several betting rounds, five more cards are (eventually) \
+           dealt face up in the middle of the table\n\
+          \ > These face-up cards are called the 'community cards.' Each \
+           player is free to use the community cards in combination with their \
+           hole cards to build a five-card poker hand.\n\
+          \ > Put simply, the person with the best hand wins. But there is a \
+           lot of strategy involved to be good at poker. A well known \
+           technique is 'bluffing'.\n\
+           credits: https://www.pokernews.com/poker-rules/texas-holdem.html \n\n");
+
       ANSITerminal.print_string [ ANSITerminal.magenta ]
-        "\n\nLet's begin the game!\n\n";
-      (* print_string (table playername); *)
-      print_string "\nBoth players have 500 chips each.\n";
-      print_string deal;
-      print_string "\nEnter any key to overturn your cards!\n";
+        "\n\
+         This is a single player game where the user competes against an AI \
+         named TERA.\n";
+      print_string
+        "Fun Fact: TERA is an accronym for Tyler Eric Ryan Arnaav, the members \
+         of our group.\n";
+
+      print_string "Enter your player name.\n";
+      print_string
+        "Example: Arnaav; Example Tyler; Example Ryan; Example: Eric\n";
       print_string "> ";
       match read_line () with
-      | exception End_of_file -> failwith "error"
-      | userchoice ->
-          print_string overturn_deal;
-          print_string "\nRemember your cards :))\n";
-          print_string "\nTERA has also been dealt two cards.\n";
-          print_dealer ();
+      | exception End_of_file -> ()
+      | userchoice -> (
+          let playername = userchoice ^ " " in
+          let playerinputlst = String.split_on_char ' ' playername in
+          let playerlst = List.filter (fun s -> s <> "") playerinputlst in
+          let user = Engine.make_player playername in
+          let tera = Engine.make_player "TERA" in
+          let plist = [ user; tera ] in
+          state.players <- plist;
+          ANSITerminal.print_string [ ANSITerminal.magenta ] "\nWelcome - ";
+          print_list playerlst;
+          ANSITerminal.print_string [ ANSITerminal.magenta ]
+            "\n\nLet's begin the game!\n\n";
+          (* print_string (table playername); *)
+          print_string "\nBoth players have 500 chips each.\n";
+          print_string deal;
+          print_string "\nEnter any key to overturn your cards!\n";
+          print_string "> ";
+          match read_line () with
+          | exception End_of_file -> failwith "error"
+          | userchoice ->
+              print_string overturn_deal;
+              print_string "\nRemember your cards :))\n";
+              print_string "\nTERA has also been dealt two cards.\n";
 
-          tick2 ())
+              tick2 ())
+    end
+  | "no" ->
+      ANSITerminal.(
+        print_string [ red ] "Quiting the game. See you next time :)")
+  | _ -> (
+      ANSITerminal.print_string [ ANSITerminal.red ] "\nWrong input!\n";
+      ANSITerminal.print_string [ ANSITerminal.red ]
+        "Press Q to Quit or P to Play Game.\n";
+      ANSITerminal.print_string [ ANSITerminal.red ] "> ";
+      match read_line () with
+      | "Q" ->
+          ANSITerminal.print_string [ ANSITerminal.red ]
+            "Quiting the game. See you next time :"
+      | "P" -> playgame ()
+      | _ -> ())
 
 let () = playgame2 ()
