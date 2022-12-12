@@ -88,8 +88,7 @@ let rec done_betting_help plist =
       then true
       else false
 
-let done_betting status =
-  if status.current_bet = 0 then false else done_betting_help status.players
+let done_betting status = done_betting_help status.players
 
 let increment status =
   let n = List.length status.players in

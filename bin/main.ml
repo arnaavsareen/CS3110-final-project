@@ -48,7 +48,7 @@ let rec bet_call () =
       try Engine.check state 0
       with e ->
         print_string
-          "Sorry, that bet is invalid, enter raise check or fold again: \n";
+          "Sorry, that check is invalid, enter raise check or fold again: \n";
         bet_call ())
   | "raise" -> (
       print_string
@@ -112,7 +112,7 @@ let rec execute_aidecision state p =
       try
         Engine.raise_bet state p.position r;
 
-        print_string (p.name ^ " has raised by " ^ string_of_int r ^ "\n\n")
+        print_string (p.name ^ " has raised to " ^ string_of_int r ^ "\n\n")
       with e -> execute_aidecision state p)
   | Call ->
       Engine.call state p.position;
@@ -130,7 +130,10 @@ let rec each_ai_turn state ai =
   match ai with
   | [] -> ()
   | h :: t -> (
-      print_string ("\n" ^ h.name ^ " is making their turn\n");
+      if done_betting state then ()
+      else if h.folded then
+        print_string ("\n" ^ h.name ^ " has folded so they do not get a turn")
+      else print_string ("\n" ^ h.name ^ " is making their turn\n");
       execute_aidecision state h;
       print_string "Enter any key to move to the next players turn";
       match read_line () with

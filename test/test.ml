@@ -83,6 +83,12 @@ let total_side_pot_player_test name turn_order int expected_output =
   assert_equal expected_output (total_side_pot_player turn_order int)
     ~printer:(fun a -> list_to_string string_of_int a)
 
+let done_betting_help_test name turn_order expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output
+    (done_betting_help turn_order)
+    ~printer:string_of_bool
+
 let tyler =
   {
     name = "tyler";
@@ -133,8 +139,19 @@ let big_man =
     position = 4;
   }
 
+let fold_dude =
+  {
+    name = "fold dude";
+    hand = [ kC; fourH ];
+    money = 0;
+    bet = 200;
+    folded = true;
+    position = 5;
+  }
+
 let plist = [ tyler; arnaav; ryan; eric ]
 let plist1 = [ tyler; big_man; arnaav; ryan; eric ]
+let plist2 = [ tyler; big_man; arnaav; fold_dude ]
 let test_list = [ 90; 100 ]
 
 let tests =
@@ -176,7 +193,8 @@ let tests =
              bet = 420;
              folded = false;
              position = 0;
-           }
+           };
+         done_betting_help_test "testing if done" plist2 true
          (* is_side_pot_test "testing side pot amount" plist true;
             fix_value_test "testing fix values" test_list [ 90; 10 ];
             side_pot_list_test "testing side pot" plist [ 90 ];
