@@ -55,7 +55,7 @@ val init_state : game_state
 val advance_state : game_state -> unit
 
 (*makes a player*)
-val make_player : string -> player
+val make_player : string -> int -> player
 
 (* Returns whether this game state is done betting or not.*)
 val done_betting : game_state -> bool

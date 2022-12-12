@@ -67,8 +67,8 @@ let sort_list plist =
       else 0)
     plist
 
-let make_player name =
-  { name; hand = []; money = 500; bet = 0; folded = false; position = 1 }
+let make_player name pos =
+  { name; hand = []; money = 500; bet = 0; folded = false; position = pos }
 
 let rec top_bet plist =
   match plist with
