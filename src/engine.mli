@@ -63,6 +63,9 @@ val done_betting_help : turn_order -> bool
 (*retruns true if only 1 player is in the hand false otherwise*)
 val muck_check : game_state -> bool
 
+(*returns a list of the players in the hand*)
+val players_in_hand : game_state -> player list
+
 (*Raise,fold, and check update game state as appropriately.*)
 
 (*Parameters: current gamestate , the player number, and the bet you are making.

@@ -90,13 +90,22 @@ let rec done_betting_help plist =
 let done_betting status =
   if status.iterated = false then false else done_betting_help status.players
 
-let rec players_in_hand plist =
+let rec num_players_in_hand plist =
   match plist with
   | [] -> 0
-  | h :: t -> if h.folded then players_in_hand t else 1 + players_in_hand t
+  | h :: t ->
+      if h.folded then num_players_in_hand t else 1 + num_players_in_hand t
 
 let muck_check status =
-  if players_in_hand status.players <= 1 then true else false
+  if num_players_in_hand status.players <= 1 then true else false
+
+let rec players_in_hand_help list =
+  match list with
+  | [] -> []
+  | h :: t ->
+      if h.folded then players_in_hand_help t else h :: players_in_hand_help t
+
+let players_in_hand state = players_in_hand_help state.players
 
 let valid_bet p plist b =
   if p.money = b then true (*all in*)

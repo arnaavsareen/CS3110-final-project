@@ -122,7 +122,7 @@ let rec each_ai_turn state ai =
   match ai with
   | [] -> ()
   | h :: t ->
-      if done_betting state then ()
+      if done_betting state || muck_check state then ()
       else if h.folded then (
         print_string
           ("\n" ^ h.name ^ " has folded so they do not get a turn\n\n");
@@ -169,8 +169,8 @@ let stage_value state =
   | Finish -> 6
 
 let pick_print_winner () =
-  if List.length state.players = 1 then
-    print_string ((List.hd state.players).name ^ " wins the round!")
+  if muck_check state then
+    print_string ((List.hd (players_in_hand state)).name ^ " wins the round!\n")
   else
     let player_hand_cards = (List.hd state.players).hand in
     let ai_hand_cards = (List.nth state.players 1).hand in
