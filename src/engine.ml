@@ -95,8 +95,8 @@ let rec players_in_hand plist =
   | [] -> 0
   | h :: t -> if h.folded then players_in_hand t else 1 + players_in_hand t
 
-let done_round status =
-  if players_in_hand status.players = 1 then true else false
+let muck_check status =
+  if players_in_hand status.players <= 1 then true else false
 
 let valid_bet p plist b =
   if p.money = b then true (*all in*)
@@ -283,7 +283,12 @@ let update_pot state =
       pot_amounts state.players (fix_values (bet_list state.players))
     in
     state.pot <- { amount = get_head pot_list; side_pots = get_tail pot_list }
-  else state.pot <- { amount = main_pot_amount state.players; side_pots = [] }
+  else
+    state.pot <-
+      {
+        amount = state.pot.amount + main_pot_amount state.players;
+        side_pots = [];
+      }
 
 (* let set_bet = () *)
 

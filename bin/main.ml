@@ -63,13 +63,11 @@ let rec bet_call () =
         print_string
           "Sorry, that bet is invalid, enter raise check or fold again: \n";
         bet_call ())
-  | "fold" ->
-      ANSITerminal.print_string [ ANSITerminal.green ] "\nTERA WINS!!!\n";
-      exit 0
+  | "fold" -> Engine.fold state 0
   | "call" -> Engine.call state 0
   | _ ->
-      ANSITerminal.print_string [ ANSITerminal.red ] "\nWrong input!";
-      exit 0
+      ANSITerminal.print_string [ ANSITerminal.red ] "Wrong input!";
+      bet_call ()
 
 let print_after_bet () =
   print_string
@@ -171,7 +169,8 @@ let stage_value state =
   | Finish -> 6
 
 let pick_print_winner () =
-  if List.length state.players = 1 then print_string "You win the round!"
+  if List.length state.players = 1 then
+    print_string ((List.hd state.players).name ^ " wins the round!")
   else
     let player_hand_cards = (List.hd state.players).hand in
     let ai_hand_cards = (List.nth state.players 1).hand in
@@ -187,17 +186,21 @@ let rec tick_helper state =
   (if state.stage <> Pre_Flop then
    let v = stage_value state in
    Printer.print_cards (first_k_list v state.community_cards));
-  print_dealer ();
+  if not (List.hd state.players).folded then print_dealer ();
   if done_betting state then ()
   else (
-    bet_call ();
+    if (List.hd state.players).folded then
+      print_string
+        "\nSince you folded you dont get a turn until the next hand\n"
+    else bet_call ();
     print_string "Enter any key to move to the next players turn\n>";
     match read_line () with
     | exception End_of_file -> ()
     | _ ->
         each_ai_turn state (ai_list state.players);
         state.iterated <- true;
-        if done_betting state then tick_next state);
+        if done_betting state then tick_next state;
+        if muck_check state then state.stage <- Finish);
   tick ()
 
 and tick () =
