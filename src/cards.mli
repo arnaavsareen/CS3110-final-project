@@ -37,10 +37,10 @@ val suit_arr : suit array
 (** [number_arr] are used in constructing new cards and pattern matching*)
 val number_arr : number array
 
-(** Given a card, returns the suit of it in string form*)
+(** Given a suit, returns the suit of it in string form*)
 val ascii_suit : suit -> string
 
-(** Given a card, returns the numbe rof it as a string**)
+(** Given a card, returns the number of it as a string**)
 val str_number : number -> string
 
 val shuffle : 'a array -> 'a

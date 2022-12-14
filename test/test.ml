@@ -1,3 +1,16 @@
+(************************************************************
+   Our Approach to Testing - 
+
+   We feel that the best way to test our game of poker is to play it. Being a 
+   user is one of the best ways to find bugs in our program, which is why we 
+   used the maunal testing methodology extensively. 
+   Using both the glass box and black box testing methods, we made sure to test 
+   the Cards, Engine and Ai modules that we developed. 
+   We created sample cards and players to test the functions written in our 
+   modules which were capable of non unit() outputs.  
+   Functions which had their outputs as unit() were tested maunually by running
+   our game. 
+ ************************************************************)
 open OUnit2
 open Game
 open Cards
@@ -94,8 +107,11 @@ let done_betting_test name status expected_output =
   name >:: fun _ ->
   assert_equal expected_output (done_betting status) ~printer:string_of_bool
 
-let all_in_test name plyr expected =
-  name >:: fun _ -> assert_equal expected (all_in plyr) ~printer:string_of_bool
+let ascii_suit_test name input expected_output =
+  name >:: fun _ -> assert_equal expected_output (ascii_suit input)
+
+let str_number_test name input expected_output =
+  name >:: fun _ -> assert_equal expected_output (str_number input)
 
 let ai_check = function
   | Fold -> true
@@ -298,10 +314,36 @@ let tests =
          pot_amounts_test "testing combination" plist3
            (fix_values (bet_list plist3))
            [ 360; 30; 200 ];
-         all_in_test "testing an not allin player1" eric false;
-         all_in_test "testing an not allin player2" fold_dude true;
-         all_in_test "testing an allin player" big_man true;
-         all_in_test "testing an not allin player3" ryan false;
+         ascii_suit_test "Testing ascii_suit Spades" Spades "♠";
+         ascii_suit_test "Testing ascii_suit Hearts" Hearts "♥";
+         ascii_suit_test "Testing ascii_suit Diamonds" Diamonds "♦";
+         ascii_suit_test "Testing ascii_suit Clubs" Clubs "♣";
+         str_number_test "Testing string representation of numbers" (Number 14)
+           "A";
+         str_number_test "Testing string representation of numbers" (Number 13)
+           "Q";
+         str_number_test "Testing string representation of numbers" (Number 12)
+           "K";
+         str_number_test "Testing string representation of numbers" (Number 11)
+           "J";
+         str_number_test "Testing string representation of numbers" (Number 10)
+           "A";
+         str_number_test "Testing string representation of numbers" (Number 9)
+           "9";
+         str_number_test "Testing string representation of numbers" (Number 8)
+           "8";
+         str_number_test "Testing string representation of numbers" (Number 7)
+           "7";
+         str_number_test "Testing string representation of numbers" (Number 6)
+           "6";
+         str_number_test "Testing string representation of numbers" (Number 5)
+           "5";
+         str_number_test "Testing string representation of numbers" (Number 4)
+           "4";
+         str_number_test "Testing string representation of numbers" (Number 3)
+           "3";
+         str_number_test "Testing string representation of numbers" (Number 2)
+           "2";
        ]
        @ ai_tests
 

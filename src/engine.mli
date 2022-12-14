@@ -99,6 +99,11 @@ val update_pot : game_state -> unit
     be a new pot with the amount equal to the previous pot plus the sum of all
     the bets the players have made for that round and return unit*)
 
+val update_money : game_state -> turn_order -> unit
+(**Parameters: game state and the list if the players who won each pot.
+   update_money updates the players who won each pot's money to the appropriate
+   amount*)
+
 val next_turn : unit -> unit
 (** Represents the next turn.*)
 
