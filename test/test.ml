@@ -94,6 +94,9 @@ let done_betting_test name status expected_output =
   name >:: fun _ ->
   assert_equal expected_output (done_betting status) ~printer:string_of_bool
 
+let all_in_test name plyr expected =
+  name >:: fun _ -> assert_equal expected (all_in plyr) ~printer:string_of_bool
+
 let ai_check = function
   | Fold -> true
   | Check -> true
@@ -271,6 +274,10 @@ let tests =
          ai_bet_test "Testing the AI2" 0 [ kC; jC ] eric;
          ai_bet_test "Testing the AI3" 50 [ kC; jC ] arnaav;
          ai_bet_test "Testing the AI4" 75 [ kC; jC ] big_man;
+         all_in_test "testing an not allin player1" eric false;
+         all_in_test "testing an not allin player2" fold_dude true;
+         all_in_test "testing an allin player" big_man true;
+         all_in_test "testing an not allin player3" ryan false;
        ]
 
 let _ = run_test_tt_main tests
