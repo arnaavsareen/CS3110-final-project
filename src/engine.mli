@@ -31,7 +31,8 @@ type game_stage =
   | Finish
 
 (* Game_state represesnts the state of the game, containing the stage, the
-   players, *)
+   players, the pot, the deck, community cards, current bet of the round,
+   various options, iterated?Please fill me outk, and the rounds left. *)
 type game_state = {
   mutable stage : game_stage;
   mutable players : player list;
@@ -41,12 +42,17 @@ type game_state = {
   mutable current_bet : int;
   mutable options : options;
   mutable iterated : bool;
+  mutable rounds : int;
 }
 
 type turn_order = player list
 
 (*The initial state of the game*)
 val init_state : game_state
+
+(*Decrements the round and resets the game, but keeps everybodies money. if the
+  rounds is at zero, returns false. If rounds are not, returns true.*)
+val next_game : game_state -> unit
 
 (*Advances the game to another state*)
 val advance_state : game_state -> unit
