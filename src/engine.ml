@@ -288,12 +288,42 @@ let get_tail = function
   | h :: t -> t
   | _ -> failwith "has no elements"
 
+let is_prev_sp state = if state.pot.side_pots = [] then false else true
+
+let rec add_to_tail list a =
+  match list with
+  | [] -> []
+  | h :: t ->
+      if add_to_tail t a = [] then (h + a) :: add_to_tail t a
+      else h :: add_to_tail t a
+
 let update_pot state =
-  if is_side_pot state.players then
+  if is_prev_sp state && is_side_pot state.players then
     let pot_list =
       pot_amounts state.players (fix_values (bet_list state.players))
     in
-    state.pot <- { amount = get_head pot_list; side_pots = get_tail pot_list }
+    state.pot <-
+      {
+        amount = state.pot.amount;
+        side_pots =
+          add_to_tail state.pot.side_pots (get_head pot_list)
+          @ get_tail pot_list;
+      }
+  else if is_prev_sp state && not (is_side_pot state.players) then
+    state.pot <-
+      {
+        amount = state.pot.amount;
+        side_pots = add_to_tail state.pot.side_pots state.pot.amount;
+      }
+  else if is_side_pot state.players then
+    let pot_list =
+      pot_amounts state.players (fix_values (bet_list state.players))
+    in
+    state.pot <-
+      {
+        amount = state.pot.amount + get_head pot_list;
+        side_pots = get_tail pot_list;
+      }
   else
     state.pot <-
       {
