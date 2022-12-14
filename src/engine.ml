@@ -347,6 +347,18 @@ let update_pot state =
         side_pots = [];
       }
 
+let update_money_help2 p int_list = p.money <- p.money + get_head int_list
+
+let rec update_money_help1 int_list plist =
+  match plist with
+  | [] -> ()
+  | h :: t ->
+      update_money_help2 h int_list;
+      update_money_help1 (get_tail int_list) t
+
+let update_money status plist =
+  update_money_help1 (status.pot.amount :: status.pot.side_pots) plist
+
 let draw_card state =
   let x = List.hd state.deck in
   state.deck <- List.filter (fun c -> c <> x) state.deck;
