@@ -41,6 +41,7 @@ type game_state = {
   mutable current_bet : int;
   mutable options : options;
   mutable iterated : bool;
+  mutable rounds : int;
 }
 
 type turn_order = player list
@@ -130,3 +131,7 @@ val overturn_community_cards : game_state -> unit
 
 (*returns a list of the various pot amounts in order of precidence*)
 val pot_amounts : turn_order -> int list -> int list
+
+(*Decrements the round and resets the game, but keeps everybodies money. if the
+  rounds is at zero, returns false. If rounds are not, returns true.*)
+val next_game : game_state -> unit
