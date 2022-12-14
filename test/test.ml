@@ -94,6 +94,12 @@ let done_betting_test name status expected_output =
   name >:: fun _ ->
   assert_equal expected_output (done_betting status) ~printer:string_of_bool
 
+let ascii_suit_test name input expected_output =
+  name >:: fun _ -> assert_equal expected_output (ascii_suit input)
+
+let str_number_test name input expected_output =
+  name >:: fun _ -> assert_equal expected_output (str_number input)
+
 let ai_check = function
   | Fold -> true
   | Check -> true
@@ -271,6 +277,36 @@ let tests =
          ai_bet_test "Testing the AI2" 0 [ kC; jC ] eric;
          ai_bet_test "Testing the AI3" 50 [ kC; jC ] arnaav;
          ai_bet_test "Testing the AI4" 75 [ kC; jC ] big_man;
+         ascii_suit_test "Testing ascii_suit Spades" Spades "♠";
+         ascii_suit_test "Testing ascii_suit Hearts" Hearts "♥";
+         ascii_suit_test "Testing ascii_suit Diamonds" Diamonds "♦";
+         ascii_suit_test "Testing ascii_suit Clubs" Clubs "♣";
+         str_number_test "Testing string representation of numbers" (Number 14)
+           "A";
+         str_number_test "Testing string representation of numbers" (Number 13)
+           "Q";
+         str_number_test "Testing string representation of numbers" (Number 12)
+           "K";
+         str_number_test "Testing string representation of numbers" (Number 11)
+           "J";
+         str_number_test "Testing string representation of numbers" (Number 10)
+           "A";
+         str_number_test "Testing string representation of numbers" (Number 9)
+           "9";
+         str_number_test "Testing string representation of numbers" (Number 8)
+           "8";
+         str_number_test "Testing string representation of numbers" (Number 7)
+           "7";
+         str_number_test "Testing string representation of numbers" (Number 6)
+           "6";
+         str_number_test "Testing string representation of numbers" (Number 5)
+           "5";
+         str_number_test "Testing string representation of numbers" (Number 4)
+           "4";
+         str_number_test "Testing string representation of numbers" (Number 3)
+           "3";
+         str_number_test "Testing string representation of numbers" (Number 2)
+           "2";
        ]
 
 let _ = run_test_tt_main tests
