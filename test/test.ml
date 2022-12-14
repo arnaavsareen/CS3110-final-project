@@ -2,6 +2,7 @@ open OUnit2
 open Game
 open Cards
 open Engine
+open Ai
 
 let card_to_string c =
   match c with
@@ -89,6 +90,22 @@ let done_betting_help_test name turn_order expected_output =
     (done_betting_help turn_order)
     ~printer:string_of_bool
 
+let done_betting_test name status expected_output =
+  name >:: fun _ ->
+  assert_equal expected_output (done_betting status) ~printer:string_of_bool
+
+let ai_check = function
+  | Fold -> true
+  | Check -> true
+  | Raise -> true
+  | Call -> true
+
+let ai_bet_test name bet pool plyr =
+  name >:: fun _ ->
+  assert_equal true
+    (ai_check (make_decision bet pool plyr))
+    ~printer:string_of_bool
+
 let tyler =
   {
     name = "tyler";
@@ -155,6 +172,46 @@ let plist2 = [ tyler; big_man; arnaav; fold_dude ]
 let plist3 = [ tyler; big_man; arnaav; eric ]
 let plist4 = [ tyler; fold_dude; arnaav; eric ]
 let test_list = [ 90; 100 ]
+let state = Engine.init_state
+
+let state2 =
+  {
+    stage = Pre_Flop;
+    players = [];
+    pot = { amount = 0; side_pots = [] };
+    deck = init_shuffled_deck;
+    community_cards = [];
+    current_bet = 10;
+    options = { starting_money = 0 };
+    iterated = true;
+    rounds = 4;
+  }
+
+let state3 =
+  {
+    stage = Pre_Flop;
+    players = [ ryan; eric ];
+    pot = { amount = 0; side_pots = [] };
+    deck = init_shuffled_deck;
+    community_cards = [];
+    current_bet = 10;
+    options = { starting_money = 0 };
+    iterated = true;
+    rounds = 4;
+  }
+
+let state4 =
+  {
+    stage = Pre_Flop;
+    players = [ ryan; eric ];
+    pot = { amount = 0; side_pots = [] };
+    deck = init_shuffled_deck;
+    community_cards = [];
+    current_bet = 10;
+    options = { starting_money = 0 };
+    iterated = true;
+    rounds = 4;
+  }
 
 let tests =
   "test suite for cards.ml"
@@ -197,6 +254,9 @@ let tests =
              position = 0;
            };
          done_betting_help_test "testing if done" plist2 true;
+         done_betting_test "Done_betting-1" state false;
+         done_betting_test "Done_betting-2" state2 true;
+         done_betting_test "Done_betting-3" state3 true;
          is_side_pot_test "testing side pot amount" plist true;
          fix_value_test "testing fix values" test_list [ 90; 10 ];
          bet_list_test "testing side pot" plist [ 90; 200 ];
@@ -207,6 +267,10 @@ let tests =
          pot_amounts_test "testing combination" plist3
            (fix_values (bet_list plist3))
            [ 360; 30; 200 ];
+         ai_bet_test "Testing the AI1" 100 [ kC; jC ] ryan;
+         ai_bet_test "Testing the AI2" 0 [ kC; jC ] eric;
+         ai_bet_test "Testing the AI3" 50 [ kC; jC ] arnaav;
+         ai_bet_test "Testing the AI4" 75 [ kC; jC ] big_man;
        ]
 
 let _ = run_test_tt_main tests

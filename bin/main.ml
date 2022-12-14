@@ -174,8 +174,10 @@ let pick_print_winner () =
   else
     let player_hand_cards = (List.hd state.players).hand in
     let ai_hand_cards = (List.nth state.players 1).hand in
-    let ai_hand = Hand.init_hand (ai_hand_cards @ state.deck) in
-    let player_hand = Hand.init_hand (player_hand_cards @ state.deck) in
+    let ai_hand = Hand.init_hand (ai_hand_cards @ state.community_cards) in
+    let player_hand =
+      Hand.init_hand (player_hand_cards @ state.community_cards)
+    in
     match Hand.compare ai_hand player_hand with
     | 0 -> print_string "It's a tie! \n"
     | 1 -> print_string "TERA wins the round! \n"
