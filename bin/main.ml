@@ -78,7 +78,9 @@ let print_after_bet () =
   ()
 
 let ai_bet plyr =
-  match Ai.make_decision state.current_bet state.community_cards plyr with
+  match
+    Ai.make_decision state.current_bet state.community_cards plyr Pre_Flop
+  with
   | Fold ->
       ANSITerminal.print_string [ ANSITerminal.green ]
         "\n TERA FOLDED! \n  YOU WIN!!!\n";
@@ -93,6 +95,7 @@ let ai_bet plyr =
 let rec execute_aidecision state p =
   let aidecision =
     Ai.make_decision state.current_bet (List.nth state.players 1).hand p
+      state.stage
   in
   match aidecision with
   | Fold ->

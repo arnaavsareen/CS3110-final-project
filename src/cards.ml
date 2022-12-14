@@ -239,6 +239,18 @@ module Hand = struct
     tuple is greater than another if the first card value in the tuple is
     greater, if the first values are the same you compare the second values, and
     so on.*)
+  let rank t =
+    match t with
+    | Royal_Flush -> 10
+    | Straight_Flush _ -> 9
+    | Four_of_a_kind _ -> 8
+    | Full_house _ -> 7
+    | Flush _ -> 6
+    | Straight _ -> 5
+    | Three_of_a_kind _ -> 4
+    | Two_pairs _ -> 3
+    | Pair _ -> 2
+    | High_card _ -> 1
 
   let compare t1 t2 =
     let rank t =

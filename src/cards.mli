@@ -70,7 +70,8 @@ module Hand : sig
   (** Takes a list of 7 cards as input, and returns a hand type of the best hand
     among those 7 cards*)
   val init_hand : card list -> t
-
+  (**Rank t gives the integer value of hand, worst low best high*)
+  val rank : t -> int
   (** [compare h1 h2] returns -1 if h1 is a worse hand than h2, 0 if the hands are
     equal (very rare) and 1 if h1 is a better hand than h2*)
   val compare : t -> t -> int

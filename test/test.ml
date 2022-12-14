@@ -103,10 +103,10 @@ let ai_check = function
   | Raise -> true
   | Call -> true
 
-let ai_bet_test name bet pool plyr =
+let ai_bet_test name bet pool plyr stage =
   name >:: fun _ ->
   assert_equal true
-    (ai_check (make_decision bet pool plyr))
+    (ai_check (make_decision bet pool plyr stage))
     ~printer:string_of_bool
 
 let tyler =
@@ -216,6 +216,34 @@ let state4 =
     rounds = 4;
   }
 
+let ai_tests =
+  [
+    ai_bet_test "Testing the AI1" 100
+      [
+        { color = Red; suit = Hearts; number = Number 8 };
+        { color = Black; suit = Clubs; number = Number 9 };
+      ]
+      ryan Pre_Flop;
+    ai_bet_test "Testing the AI2" 0
+      [
+        { color = Red; suit = Hearts; number = Number 8 };
+        { color = Black; suit = Clubs; number = Number 9 };
+      ]
+      eric Pre_Flop;
+    ai_bet_test "Testing the AI3" 50
+      [
+        { color = Red; suit = Hearts; number = Number 8 };
+        { color = Black; suit = Clubs; number = Number 9 };
+      ]
+      arnaav Pre_Flop;
+    ai_bet_test "Testing the AI4" 75
+      [
+        { color = Red; suit = Hearts; number = Number 8 };
+        { color = Black; suit = Clubs; number = Number 9 };
+      ]
+      big_man Pre_Flop;
+  ]
+
 let tests =
   "test suite for cards.ml"
   >::: [
@@ -270,14 +298,11 @@ let tests =
          pot_amounts_test "testing combination" plist3
            (fix_values (bet_list plist3))
            [ 360; 30; 200 ];
-         ai_bet_test "Testing the AI1" 100 [ kC; jC ] ryan;
-         ai_bet_test "Testing the AI2" 0 [ kC; jC ] eric;
-         ai_bet_test "Testing the AI3" 50 [ kC; jC ] arnaav;
-         ai_bet_test "Testing the AI4" 75 [ kC; jC ] big_man;
          all_in_test "testing an not allin player1" eric false;
          all_in_test "testing an not allin player2" fold_dude true;
          all_in_test "testing an allin player" big_man true;
          all_in_test "testing an not allin player3" ryan false;
        ]
+       @ ai_tests
 
 let _ = run_test_tt_main tests
