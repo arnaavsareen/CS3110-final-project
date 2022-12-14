@@ -77,11 +77,22 @@ let print_after_bet () =
   print_string ("The total pot is: " ^ string_of_int state.pot.amount ^ "\n");
   ()
 
+let ai_bet plyr =
+  match Ai.make_decision state.current_bet state.community_cards with
+  | Fold ->
+      ANSITerminal.print_string [ ANSITerminal.green ]
+        "\n TERA FOLDED! \n  YOU WIN!!!\n";
+      exit 0
+  | Check ->
+      Engine.check state 1;
+      ()
+  | _ -> failwith "todo"
+
 (*Makes a bet, and checks if everyone is done betting.*)
 
 let rec execute_aidecision state p =
   let aidecision =
-    Ai.make_decision state.current_bet (List.nth state.players 1).hand p
+    Ai.make_decision state.current_bet (List.nth state.players 1).hand
   in
   match aidecision with
   | Fold ->
@@ -115,13 +126,17 @@ let rec each_ai_turn state ai =
       else if h.folded then (
         print_string
           ("\n" ^ h.name ^ " has folded so they do not get a turn\n\n");
-
-        each_ai_turn state t)
+        print_string "Enter any key to move to the next players turn\n>";
+        match read_line () with
+        | exception End_of_file -> ()
+        | _ -> each_ai_turn state t)
       else (
         print_string ("\n" ^ h.name ^ " is making their turn\n");
         execute_aidecision state h;
-
-        each_ai_turn state t)
+        print_string "Enter any key to move to the next players turn\n>";
+        match read_line () with
+        | exception End_of_file -> ()
+        | _ -> each_ai_turn state t)
 
 let next_stage state =
   match state.stage with
@@ -196,11 +211,7 @@ and tick () =
   | Flop -> tick_helper state
   | Turn -> tick_helper state
   | River -> tick_helper state
-  | Finish ->
-      if state.rounds > 0 then (
-        Engine.next_game state;
-        tick_helper state)
-      else pick_print_winner ()
+  | Finish -> pick_print_winner ()
 
 let make_player_list player pnum =
   if pnum = 2 then player :: [ Engine.make_player "TERA" 1 ]

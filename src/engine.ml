@@ -37,7 +37,6 @@ type game_state = {
   mutable current_bet : int;
   mutable options : options;
   mutable iterated : bool;
-  mutable rounds : int;
 }
 
 exception Invalid_Bet of string
@@ -54,7 +53,6 @@ let init_state =
     current_bet = 10;
     options = { starting_money = 0 };
     iterated = false;
-    rounds = 4;
   }
 
 let advance_state x = ()
@@ -326,23 +324,3 @@ let overturn_community_cards state =
       draw_card state;
       draw_card state;
     ]
-
-let player_reset plyr =
-  {
-    name = plyr.name;
-    hand = [];
-    money = plyr.money;
-    bet = 0;
-    folded = false;
-    position = plyr.position;
-  }
-
-let next_game status =
-  status.stage <- Pre_Flop;
-  status.current_bet <- 0;
-  status.community_cards <- [];
-  status.iterated <- false;
-  status.rounds <- status.rounds - 1;
-  status.deck <- init_shuffled_deck;
-  status.pot <- { amount = 0; side_pots = [] };
-  status.players <- List.map player_reset status.players
