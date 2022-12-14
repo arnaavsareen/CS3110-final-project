@@ -4,12 +4,12 @@ open Stdlib
 exception Impossible
 
 type player = {
-  name : string;
-  hand : card list;
-  money : int;
-  bet : int;
-  folded : bool;
-  position : int;
+  mutable name : string;
+  mutable hand : card list;
+  mutable money : int;
+  mutable bet : int;
+  mutable folded : bool;
+  mutable position : int;
 }
 
 type pot = {
