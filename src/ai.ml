@@ -32,7 +32,7 @@ let decision_helper state pool hand =
   let s = state_conversion state in
   if s = 1 then high_roll
   else
-    let r = Cards.Hand.rank (Cards.Hand.init_hand (pool @ hand)) in
+    let r = 3 in
     if r > 5 then super_roll
     else if r > 3 then high_roll
     else if r > 1 then avg_roll
