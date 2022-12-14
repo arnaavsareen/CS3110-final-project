@@ -16,10 +16,10 @@ type percents = {
 }
 
 let instant_death = { fold = 100; check = 0; raise = 0.0 }
-let low_roll = { fold = 50; check = 95; raise = 0.1 }
-let avg_roll = { fold = 17; check = 85; raise = 0.25 }
-let high_roll = { fold = 0; check = 70; raise = 0.75 }
-let super_roll = { fold = 0; check = 50; raise = 1.0 }
+let low_roll = { fold = 50; check = 80; raise = 0.1 }
+let avg_roll = { fold = 17; check = 75; raise = 0.25 }
+let high_roll = { fold = 0; check = 50; raise = 0.75 }
+let super_roll = { fold = 0; check = 25; raise = 1.0 }
 
 let state_conversion = function
   | Pre_Flop -> 1
@@ -32,7 +32,15 @@ let decision_helper state pool hand =
   let s = state_conversion state in
   if s = 1 then high_roll
   else
-    let r = 3 in
+    let r =
+      Cards.Hand.rank
+        (Cards.Hand.init_hand
+           (pool @ hand
+           @ [
+               { color = Red; suit = Hearts; number = Number 300 };
+               { color = Red; suit = Hearts; number = Number 250 };
+             ]))
+    in
     if r > 5 then super_roll
     else if r > 3 then high_roll
     else if r > 1 then avg_roll
