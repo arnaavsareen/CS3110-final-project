@@ -1,3 +1,16 @@
+(************************************************************
+   Our Approach to Testing - 
+
+   We feel that the best way to test our game of poker is to play it. Being a 
+   user is one of the best ways to find bugs in our program, which is why we 
+   used the maunal testing methodology extensively. 
+   Using both the glass box and black box testing methods, we made sure to test 
+   the Cards, Engine and Ai modules that we developed. 
+   We created sample cards and players to test the functions written in our 
+   modules which were capable of non unit() outputs.  
+   Functions which had their outputs as unit() were tested maunually by running
+   our game. 
+ ************************************************************)
 open OUnit2
 open Game
 open Cards
