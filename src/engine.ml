@@ -280,6 +280,22 @@ let rec pot_amounts plist sp_list =
   | h :: t ->
       total_pot_amount plist h :: pot_amounts (remove_pot_amount plist h) t
 
+let rec player_in_pot plist amount =
+  match plist with
+  | [] -> []
+  | p :: t ->
+      if p.bet - amount >= 0 && not p.folded then p :: player_in_pot t amount
+      else player_in_pot t amount
+
+let rec players_in_pots plist bet_list =
+  match bet_list with
+  | [] -> []
+  | h :: t ->
+      player_in_pot plist h :: players_in_pots (remove_pot_amount plist h) t
+
+let players_in_pot_list state =
+  players_in_pots state.players (bet_list state.players)
+
 let get_head = function
   | h :: t -> h
   | _ -> failwith "has no elements"
@@ -330,11 +346,6 @@ let update_pot state =
         amount = state.pot.amount + main_pot_amount state.players;
         side_pots = [];
       }
-
-(* let set_bet = () *)
-
-(*{ amount = main_pot_amount plist; side_pots = [] }*)
-(*testing*)
 
 let draw_card state =
   let x = List.hd state.deck in
