@@ -1,5 +1,5 @@
 (** CS 3110 Fall 2022 Final Project 
-    @author Arnaav Sareen, Ryan Noonan, Tyler Forstrom, and Eric Yang) *)
+    @author Arnaav Sareen, Ryan Noonan, Tyler Forstrom, and Eric Yang. *)
 
 (************************************************************
    Academic Integrity Statement
