@@ -45,11 +45,27 @@ let number_int_pair_to_string (n, i) =
 (*Creating cards for testing*)
 let aC = { color = Black; suit = Clubs; number = Number 14 }
 let aH = { color = Red; suit = Hearts; number = Number 14 }
+let aD = { color = Red; suit = Diamonds; number = Number 14 }
+let aS = { color = Black; suit = Spades; number = Number 14 }
 let kC = { color = Black; suit = Clubs; number = Number 13 }
+let kD = { color = Red; suit = Diamonds; number = Number 13 }
+let kH = { color = Red; suit = Hearts; number = Number 13 }
+let kS = { color = Black; suit = Spades; number = Number 13 }
 let jC = { color = Black; suit = Clubs; number = Number 11 }
 let fourC = { color = Black; suit = Clubs; number = Number 4 }
 let fourH = { color = Red; suit = Hearts; number = Number 4 }
+let sixD = { color = Red; suit = Diamonds; number = Number 6 }
+let sixH = { color = Red; suit = Hearts; number = Number 6 }
+let sixC = { color = Black; suit = Clubs; number = Number 6 }
 let sevenH = { color = Red; suit = Hearts; number = Number 7 }
+let eightC = { color = Black; suit = Clubs; number = Number 8 }
+let aS = { color = Black; suit = Spades; number = Number 14 }
+let qC = { color = Black; suit = Clubs; number = Number 12 }
+let qH = { color = Red; suit = Hearts; number = Number 12 }
+let jC = { color = Black; suit = Clubs; number = Number 11 }
+let tenC = { color = Black; suit = Clubs; number = Number 10 }
+let nineC = { color = Black; suit = Clubs; number = Number 9 }
+let nineH = { color = Red; suit = Hearts; number = Number 9 }
 
 let ordered_card_mult_test name card_list expected_output =
   name >:: fun _ ->
@@ -260,9 +276,84 @@ let ai_tests =
       big_man Pre_Flop;
   ]
 
+let hand_module_tests =
+  [
+    (*Tests for Hand module*)
+    ordered_card_mult_test "random 7 cards"
+      [ aC; aH; kC; jC; fourC; fourH; sevenH ]
+      [
+        (Number 14, 2);
+        (Number 4, 2);
+        (Number 13, 1);
+        (Number 11, 1);
+        (Number 7, 1);
+      ];
+    (*ordered_card_mult_test*)
+    ordered_card_mult_test "four of a kind"
+      [ aC; aH; kC; aC; aH; sevenH; fourH ]
+      [ (Number 14, 4); (Number 13, 1); (Number 7, 1); (Number 4, 1) ];
+    ordered_card_mult_test "Royal Flush"
+      [ aC; fourH; jC; fourC; kC; qC; tenC ]
+      [
+        (Number 4, 2);
+        (Number 14, 1);
+        (Number 13, 1);
+        (Number 12, 1);
+        (Number 11, 1);
+        (Number 10, 1);
+      ];
+    (*card to string test*)
+    ( "test card to string" >:: fun _ ->
+      assert_equal "7 of Hearts" (card_to_string sevenH) );
+    ( "test card list to string" >:: fun _ ->
+      assert_equal "[7 of Hearts; 13 of Clubs; ]"
+        (list_to_string card_to_string [ sevenH; kC ])
+        ~printer:(fun x -> x) );
+    (*init_hand tests*)
+    init_hand_test "Royal Flush"
+      [ aC; fourH; jC; fourC; kC; qC; tenC ]
+      "Royal Flush";
+    init_hand_test "four of a kind"
+      [ aC; aH; kC; kS; aC; aH; sevenH; fourH ]
+      "Four of a kind 14, 13";
+    init_hand_test "four of a kind 2"
+      [ kC; aH; kC; kS; aC; kH; sevenH; fourH ]
+      "Four of a kind 13, 14";
+    init_hand_test "Straight Flush"
+      [ nineC; fourH; jC; kS; kC; qC; tenC ]
+      "Straight Flush 13";
+    init_hand_test "Full house 13 14"
+      [ aC; aH; jC; kS; kC; jC; kC ]
+      "Full House 13, 14";
+    init_hand_test "Flush that has straight for different cards"
+      [ aC; tenC; jC; kS; kC; fourC; qH ]
+      "Flush 14, 13, 11, 10, 4";
+    init_hand_test "Straight"
+      [ aC; tenC; jC; eightC; sixD; nineH; qH ]
+      "Straight 12";
+    init_hand_test "Other Straight"
+      [ aC; tenC; sevenH; eightC; sixD; nineH; kH ]
+      "Straight 10";
+    init_hand_test "Straight and three of a kind is straight"
+      [ sixH; tenC; sevenH; eightC; sixD; nineH; sixC ]
+      "Straight 10";
+    init_hand_test "Three of a kind"
+      [ sixH; tenC; sevenH; kC; sixD; nineH; sixC ]
+      "Three of a kind 6, 13, 10";
+    init_hand_test "Two pairs"
+      [ kH; tenC; sevenH; kC; sixD; nineH; sixC ]
+      "Two pairs 13, 6, 10";
+    init_hand_test "High card"
+      [ kH; tenC; sevenH; fourC; jC; nineH; sixC ]
+      "High card 13, 11, 10, 9, 7";
+    init_hand_test "Full house with 5 cards to check if it works"
+      [ aC; aH; kS; kC; kC ] "Full House 13, 14";
+  ]
+
 let tests =
   "test suite for cards.ml"
-  >::: [
+
+  >::: hand_module_tests @ [
          ("random" >:: fun _ -> assert_equal 1 1);
          (*Tests for Hand module*)
          ordered_card_mult_test "random 7 cards"
@@ -346,5 +437,6 @@ let tests =
            "2";
        ]
        @ ai_tests
+
 
 let _ = run_test_tt_main tests
