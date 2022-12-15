@@ -16,8 +16,8 @@ type percents = {
 }
 
 let instant_death = { fold = 100; check = 0; raise = 0.0 }
-let low_roll = { fold = 50; check = 80; raise = 0.1 }
-let avg_roll = { fold = 17; check = 75; raise = 0.25 }
+let low_roll = { fold = 30; check = 85; raise = 0.1 }
+let avg_roll = { fold = 20; check = 80; raise = 0.25 }
 let high_roll = { fold = 0; check = 50; raise = 0.75 }
 let super_roll = { fold = 0; check = 25; raise = 1.0 }
 

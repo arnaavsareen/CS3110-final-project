@@ -216,7 +216,16 @@ and tick () =
   | Flop -> tick_helper state
   | Turn -> tick_helper state
   | River -> tick_helper state
-  | Finish -> pick_print_winner ()
+  | Finish ->
+      next_game state (winner ());
+      if state.rounds < 1 then pick_print_winner ()
+      else print_string "Starting up a new round!";
+      state.stage <- Pre_Flop;
+      Engine.deal_cards state;
+      Printer.print_cards (List.hd state.players).hand;
+      print_string "\nRemember your cards :))\n";
+      print_string "\nOther players have also been dealt two cards.\n";
+      tick ()
 
 let make_player_list player pnum =
   if pnum = 2 then player :: [ Engine.make_player "TERA" 1 ]
