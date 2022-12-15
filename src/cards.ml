@@ -101,6 +101,31 @@ let deal =
   let card7 = "      └─────────┘ └─────────┘         \n" in
   card1 ^ card2 ^ card3 ^ card4 ^ card5 ^ card6 ^ card7
 
+let card_to_string c =
+  match c with
+  | { suit = Clubs; number = Number i } -> string_of_int i ^ " of Clubs"
+  | { suit = Hearts; number = Number i } -> string_of_int i ^ " of Hearts"
+  | { suit = Spades; number = Number i } -> string_of_int i ^ " of Spades"
+  | { suit = Diamonds; number = Number i } -> string_of_int i ^ " of Diamonds"
+
+let rec list_to_string f lst =
+  let rec matching lst =
+    match lst with
+    | [] -> "]"
+    | h :: t -> f h ^ "; " ^ matching t
+  in
+  "[" ^ matching lst
+
+let int_card_pair_to_string (c, i) =
+  "(" ^ card_to_string c ^ ", " ^ string_of_int i ^ ")"
+
+let number_int_pair_to_string (n, i) =
+  "("
+  ^ string_of_int
+      (match n with
+      | Number a -> a)
+  ^ ", " ^ string_of_int i ^ ")"
+
 module Hand = struct
   type t =
     (*Many of these types can be represented by a t-uple of cards where t is
@@ -146,40 +171,23 @@ module Hand = struct
   let is_straight (cards : (number * int) list) =
     let count = ref 1 in
     let boolean = ref false in
-
-    (* for i = 0 to List.length cards do if fst (List.nth cards i) =
-       number_minus_one (fst (List.nth cards (i-1))) then count := !count + 1;
-       if !count = 5 then true else count := 1 ; *)
+    let reordered_cards =
+      List.sort_uniq (fun (n1, i1) (n2, i2) -> -compare n1 n2) cards
+    in
     let i = ref 0 in
-    while !i < List.length cards - 2 && !boolean = false do
-      i := !i + 1;
+    while !i <= List.length reordered_cards - 2 && !boolean = false do
       if
-        fst (List.nth cards !i)
-        = number_minus_one (fst (List.nth cards (!i + 1)))
-      then count := !count + 1;
-      if !count = 5 then boolean := true
+        number_minus_one (fst (List.nth reordered_cards !i))
+        = fst (List.nth reordered_cards (!i + 1))
+      then count := !count + 1
+      else count := 1;
+      if !count = 5 then boolean := true;
+      i := !i + 1
     done;
-    !boolean
+    if !boolean then (!boolean, fst (List.nth reordered_cards (!i - 4)))
+    else (false, Number 1)
 
-  let is_flush (cards : card list) =
-    let hearts_counter = ref 0 in
-    let spades_counter = ref 0 in
-    let clubs_counter = ref 0 in
-    let diamonds_counter = ref 0 in
-    for i = 0 to List.length cards - 1 do
-      match (List.nth cards i).suit with
-      | Clubs -> clubs_counter := !clubs_counter + 1
-      | Diamonds -> diamonds_counter := !diamonds_counter + 1
-      | Hearts -> hearts_counter := !hearts_counter + 1
-      | Spades -> spades_counter := !spades_counter + 1
-    done;
-    if
-      !hearts_counter >= 5 || !spades_counter >= 5 || !clubs_counter >= 5
-      || !diamonds_counter >= 5
-    then true
-    else false
-
-  let is_flush2 cards =
+  let is_flush cards =
     let hearts = List.filter (fun c -> c.suit = Hearts) cards in
     let clubs = List.filter (fun c -> c.suit = Clubs) cards in
     let diamonds = List.filter (fun c -> c.suit = Diamonds) cards in
@@ -190,16 +198,27 @@ module Hand = struct
     else if List.length spades >= 5 then (true, spades)
     else (false, spades)
 
-  let init_hand (cards : card list) =
-    let is_flush, flush = is_flush2 cards in
+  let is_straight_flush cards =
+    let is_flush, flush = is_flush cards in
+    if is_flush then
+      let ordered_flush = List.sort_uniq Stdlib.compare flush in
 
+      is_straight (ordered_cards_mult ordered_flush)
+    else (false, Number 2)
+
+  let init_hand (cards : card list) =
     let ordered_cards = ordered_cards_mult cards in
-    let is_straight = is_straight ordered_cards in
+    let is_straight_flush, n = is_straight_flush cards in
+
+    (* let is_straight = is_straight ordered_cards in *)
     (*Straight flush / royal flush case*)
-    if is_straight = true && is_flush = true then
-      let n = fst (List.hd ordered_cards) in
+    if is_straight_flush then
       if n = Number 14 then Royal_Flush else Straight_Flush n
     else
+      let is_flush_bool, unsort_flush = is_flush cards in
+
+      let is_straight, n = is_straight ordered_cards in
+
       (*Four of a kind case*)
       let n1, n2 =
         (fst (List.hd ordered_cards), fst (List.nth ordered_cards 1))
@@ -210,14 +229,17 @@ module Hand = struct
       match (m1, m2) with
       | 4, _ -> Four_of_a_kind (n1, n2)
       | 3, i when i >= 2 -> Full_house (n1, n2)
-      | _ when is_flush ->
+      | _, _ when is_flush_bool ->
+          let flush = List.sort_uniq (fun x y -> -compare x y) unsort_flush in
           let flush_ordered = ordered_cards_mult flush in
+
           Flush
             ( fst (List.hd flush_ordered),
               fst (List.nth flush_ordered 1),
               fst (List.nth flush_ordered 2),
               fst (List.nth flush_ordered 3),
               fst (List.nth flush_ordered 4) )
+      | _ when is_straight -> Straight n
       | 3, _ -> Three_of_a_kind (n1, n2, fst (List.nth ordered_cards 2))
       | 2, 2 -> Two_pairs (n1, n2, fst (List.nth ordered_cards 2))
       | 2, _ ->
@@ -279,49 +301,23 @@ module Hand = struct
     | Royal_Flush -> "Royal Flush"
     | Straight_Flush (Number n) -> "Straight Flush " ^ string_of_int n
     | Four_of_a_kind (Number n, Number n2) ->
-        "Four_of_a_kind " ^ string_of_int n ^ ", " ^ string_of_int n2
+        "Four of a kind " ^ string_of_int n ^ ", " ^ string_of_int n2
     | Full_house (Number n, Number n2) ->
-        "Full_House " ^ string_of_int n ^ ", " ^ string_of_int n2
+        "Full House " ^ string_of_int n ^ ", " ^ string_of_int n2
     | Flush (Number n1, Number n2, Number n3, Number n4, Number n5) ->
         "Flush " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3 ^ ", " ^ string_of_int n4 ^ ", " ^ string_of_int n5
     | Straight (Number n1) -> "Straight " ^ string_of_int n1
     | Two_pairs (Number n1, Number n2, Number n3) ->
-        "Two_pairs " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        "Two pairs " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3
     | Pair (Number n1, Number n2, Number n3, Number n4) ->
         "Pair " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3 ^ ", " ^ string_of_int n4
     | High_card (Number n1, Number n2, Number n3, Number n4, Number n5) ->
-        "High_card " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        "High card " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3 ^ ", " ^ string_of_int n4 ^ ", " ^ string_of_int n5
-        ^ ", "
     | Three_of_a_kind (Number n1, Number n2, Number n3) ->
-        "Flush " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
+        "Three of a kind " ^ string_of_int n1 ^ ", " ^ string_of_int n2 ^ ", "
         ^ string_of_int n3
 end
-
-let card_to_string c =
-  match c with
-  | { suit = Clubs; number = Number i } -> string_of_int i ^ " of Clubs"
-  | { suit = Hearts; number = Number i } -> string_of_int i ^ " of Hearts"
-  | { suit = Spades; number = Number i } -> string_of_int i ^ " of Spades"
-  | { suit = Diamonds; number = Number i } -> string_of_int i ^ " of Diamonds"
-
-let rec list_to_string f lst =
-  let rec matching lst =
-    match lst with
-    | [] -> "]"
-    | h :: t -> f h ^ "; " ^ matching t
-  in
-  "[" ^ matching lst
-
-let int_card_pair_to_string (c, i) =
-  "(" ^ card_to_string c ^ ", " ^ string_of_int i ^ ")"
-
-let number_int_pair_to_string (n, i) =
-  "("
-  ^ string_of_int
-      (match n with
-      | Number a -> a)
-  ^ ", " ^ string_of_int i ^ ")"
