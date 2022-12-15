@@ -352,91 +352,67 @@ let hand_module_tests =
 
 let tests =
   "test suite for cards.ml"
-
-  >::: hand_module_tests @ [
-         ("random" >:: fun _ -> assert_equal 1 1);
-         (*Tests for Hand module*)
-         ordered_card_mult_test "random 7 cards"
-           [ aC; aH; kC; jC; fourC; fourH; sevenH ]
-           [
-             (Number 14, 2);
-             (Number 4, 2);
-             (Number 13, 1);
-             (Number 11, 1);
-             (Number 7, 1);
-           ];
-         ordered_card_mult_test "four of a kind"
-           [ aC; aH; kC; aC; aH; sevenH; fourH ]
-           [ (Number 14, 4); (Number 13, 1); (Number 7, 1); (Number 4, 1) ];
-         ( "test card to string" >:: fun _ ->
-           assert_equal "7 of Hearts" (card_to_string sevenH) );
-         ( "test card list to string" >:: fun _ ->
-           assert_equal "[7 of Hearts; 13 of Clubs; ]"
-             (list_to_string card_to_string [ sevenH; kC ])
-             ~printer:(fun x -> x) );
-         init_hand_test "four of a kind"
-           [ aC; aH; kC; aC; aH; sevenH; fourH ]
-           "Four_of_a_kind 14, 13";
-         top_bet_test "testing top bet" plist 420;
-         call_amount_test "testing all in" eric plist 100;
-         call_amount_test "testing regular call" tyler plist 220;
-         make_bet_test "testing bet over money" tyler plist 1100 tyler;
-         make_bet_test "testing bet below top bet" tyler plist 100 tyler;
-         make_bet_test "testing valid bet" tyler plist 220
-           {
-             name = "tyler";
-             hand = [ fourC; sevenH ];
-             money = 780;
-             bet = 420;
-             folded = false;
-             position = 0;
-           };
-         done_betting_help_test "testing if done" plist2 true;
-         done_betting_test "Done_betting-1" state false;
-         done_betting_test "Done_betting-2" state2 true;
-         done_betting_test "Done_betting-3" state3 true;
-         is_side_pot_test "testing side pot amount" plist true;
-         fix_value_test "testing fix values" test_list [ 90; 10 ];
-         bet_list_test "testing side pot" plist [ 90; 200 ];
-         bet_list_test "testing side pot" plist1 [ 90; 100; 200 ];
-         bet_list_test "testing sidepot" plist3 [ 90; 100; 200 ];
-         pot_amounts_test "testing pot amount" plist3 [ 90; 10; 100 ]
-           [ 360; 30; 200 ];
-         pot_amounts_test "testing combination" plist3
-           (fix_values (bet_list plist3))
-           [ 360; 30; 200 ];
-         ascii_suit_test "Testing ascii_suit Spades" Spades "♠";
-         ascii_suit_test "Testing ascii_suit Hearts" Hearts "♥";
-         ascii_suit_test "Testing ascii_suit Diamonds" Diamonds "♦";
-         ascii_suit_test "Testing ascii_suit Clubs" Clubs "♣";
-         str_number_test "Testing string representation of numbers" (Number 14)
-           "A";
-         str_number_test "Testing string representation of numbers" (Number 13)
-           "Q";
-         str_number_test "Testing string representation of numbers" (Number 12)
-           "K";
-         str_number_test "Testing string representation of numbers" (Number 11)
-           "J";
-         str_number_test "Testing string representation of numbers" (Number 10)
-           "A";
-         str_number_test "Testing string representation of numbers" (Number 9)
-           "9";
-         str_number_test "Testing string representation of numbers" (Number 8)
-           "8";
-         str_number_test "Testing string representation of numbers" (Number 7)
-           "7";
-         str_number_test "Testing string representation of numbers" (Number 6)
-           "6";
-         str_number_test "Testing string representation of numbers" (Number 5)
-           "5";
-         str_number_test "Testing string representation of numbers" (Number 4)
-           "4";
-         str_number_test "Testing string representation of numbers" (Number 3)
-           "3";
-         str_number_test "Testing string representation of numbers" (Number 2)
-           "2";
-       ]
+  >::: hand_module_tests
+       @ [
+           top_bet_test "testing top bet" plist 420;
+           call_amount_test "testing all in" eric plist 100;
+           call_amount_test "testing regular call" tyler plist 220;
+           make_bet_test "testing bet over money" tyler plist 1100 tyler;
+           make_bet_test "testing bet below top bet" tyler plist 100 tyler;
+           make_bet_test "testing valid bet" tyler plist 220
+             {
+               name = "tyler";
+               hand = [ fourC; sevenH ];
+               money = 780;
+               bet = 420;
+               folded = false;
+               position = 0;
+             };
+           done_betting_help_test "testing if done" plist2 true;
+           done_betting_test "Done_betting-1" state false;
+           done_betting_test "Done_betting-2" state2 true;
+           done_betting_test "Done_betting-3" state3 true;
+           is_side_pot_test "testing side pot amount" plist true;
+           fix_value_test "testing fix values" test_list [ 90; 10 ];
+           bet_list_test "testing side pot" plist [ 90; 200 ];
+           bet_list_test "testing side pot" plist1 [ 90; 100; 200 ];
+           bet_list_test "testing sidepot" plist3 [ 90; 100; 200 ];
+           pot_amounts_test "testing pot amount" plist3 [ 90; 10; 100 ]
+             [ 360; 30; 200 ];
+           pot_amounts_test "testing combination" plist3
+             (fix_values (bet_list plist3))
+             [ 360; 30; 200 ];
+           ascii_suit_test "Testing ascii_suit Spades" Spades "♠";
+           ascii_suit_test "Testing ascii_suit Hearts" Hearts "♥";
+           ascii_suit_test "Testing ascii_suit Diamonds" Diamonds "♦";
+           ascii_suit_test "Testing ascii_suit Clubs" Clubs "♣";
+           str_number_test "Testing string representation of numbers"
+             (Number 14) "A";
+           str_number_test "Testing string representation of numbers"
+             (Number 13) "Q";
+           str_number_test "Testing string representation of numbers"
+             (Number 12) "K";
+           str_number_test "Testing string representation of numbers"
+             (Number 11) "J";
+           str_number_test "Testing string representation of numbers"
+             (Number 10) "A";
+           str_number_test "Testing string representation of numbers" (Number 9)
+             "9";
+           str_number_test "Testing string representation of numbers" (Number 8)
+             "8";
+           str_number_test "Testing string representation of numbers" (Number 7)
+             "7";
+           str_number_test "Testing string representation of numbers" (Number 6)
+             "6";
+           str_number_test "Testing string representation of numbers" (Number 5)
+             "5";
+           str_number_test "Testing string representation of numbers" (Number 4)
+             "4";
+           str_number_test "Testing string representation of numbers" (Number 3)
+             "3";
+           str_number_test "Testing string representation of numbers" (Number 2)
+             "2";
+         ]
        @ ai_tests
-
 
 let _ = run_test_tt_main tests
