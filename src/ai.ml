@@ -37,8 +37,8 @@ let decision_helper state pool hand =
         (Cards.Hand.init_hand
            (pool @ hand
            @ [
-               { color = Red; suit = Hearts; number = Number 300 };
-               { color = Red; suit = Hearts; number = Number 250 };
+               { color = Red; suit = Hearts; number = Number 10 };
+               { color = Red; suit = Hearts; number = Number 12 };
              ]))
     in
     if r > 5 then super_roll
