@@ -9,6 +9,9 @@ open Printer
 
 exception Unimplemented of string
 
+let first (x, y) = x
+let second (x, y) = y
+
 let rec print_list = function
   | [] -> ()
   | head :: tail ->
@@ -171,21 +174,18 @@ let stage_value state =
   | River -> 5
   | Finish -> 6
 
+let winner () =
+  List.sort_uniq
+    (fun x y ->
+      Hand.compare
+        (Hand.init_hand (first x @ state.community_cards))
+        (Hand.init_hand (first y @ state.community_cards)))
+    (plyr_assoc_list state.players)
+
 let pick_print_winner () =
   if muck_check state then
     print_string ((List.hd (players_in_hand state)).name ^ " wins the round!\n")
-  else
-    let player_hand_cards = (List.hd state.players).hand in
-    let ai_hand_cards = (List.nth state.players 1).hand in
-    let ai_hand = Hand.init_hand (ai_hand_cards @ state.community_cards) in
-    let player_hand =
-      Hand.init_hand (player_hand_cards @ state.community_cards)
-    in
-    match Hand.compare ai_hand player_hand with
-    | 0 -> print_string "It's a tie! \n"
-    | 1 -> print_string "TERA wins the round! \n"
-    | -1 -> print_string "Your hand was the best! You win the round! \n"
-    | _ -> failwith "not possible"
+  else print_string ((second (List.nth (winner ()) 1)).name ^ " Wins! \n")
 
 let rec tick_helper state =
   (if state.stage <> Pre_Flop then

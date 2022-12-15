@@ -3,6 +3,9 @@ open Stdlib
 
 exception Impossible
 
+let first (x, y) = x
+let second (x, y) = y
+
 type player = {
   mutable name : string;
   mutable hand : card list;
@@ -380,22 +383,28 @@ let overturn_community_cards state =
       draw_card state;
     ]
 
-let player_reset plyr =
+let plyr_assoc_list lst = List.map (fun plyr -> (plyr.hand, plyr)) lst
+
+let plyr_reset_helper plyr payout rank =
+  if second (List.nth rank 0) = plyr then payout else 0
+
+let player_reset payout rank plyr =
+  let payout = plyr_reset_helper plyr payout rank in
   {
     name = plyr.name;
     hand = [];
-    money = plyr.money;
+    money = plyr.money + payout;
     bet = 0;
     folded = false;
     position = plyr.position;
   }
 
-let next_game status =
+let next_game status lst =
+  status.players <- List.map (player_reset status.pot.amount lst) status.players;
   status.stage <- Pre_Flop;
   status.current_bet <- 0;
   status.community_cards <- [];
   status.iterated <- false;
   status.rounds <- status.rounds - 1;
   status.deck <- init_shuffled_deck;
-  status.pot <- { amount = 0; side_pots = [] };
-  status.players <- List.map player_reset status.players
+  status.pot <- { amount = 0; side_pots = [] }

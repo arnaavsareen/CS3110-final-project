@@ -161,9 +161,13 @@ val players_in_pot_list : game_state -> player list list
     to win the main pot as the first element and the list of players able to win
     the side pot as the second*)
 
+val plyr_assoc_list : player list -> (card list * player) list
+
+(*Constructs an association list given a state, listing all players wiwth their
+  correpsonding hand.*)
 val pot_amounts : turn_order -> int list -> int list
 (** Returns a list of the various pot amounts in order of precidence*)
 
-val next_game : game_state -> unit
+val next_game : game_state -> (card list * player) list -> unit
 (** Decrements the round and resets the game, but keeps everybodies money. if
     the rounds is at zero, returns false. If rounds are not, returns true.\*)
