@@ -4,12 +4,12 @@ open Stdlib
 exception Impossible
 
 type player = {
-  name : string;
-  hand : card list;
-  money : int;
-  bet : int;
-  folded : bool;
-  position : int;
+  mutable name : string;
+  mutable hand : card list;
+  mutable money : int;
+  mutable bet : int;
+  mutable folded : bool;
+  mutable position : int;
 }
 
 type pot = {
@@ -280,6 +280,22 @@ let rec pot_amounts plist sp_list =
   | h :: t ->
       total_pot_amount plist h :: pot_amounts (remove_pot_amount plist h) t
 
+let rec player_in_pot plist amount =
+  match plist with
+  | [] -> []
+  | p :: t ->
+      if p.bet - amount >= 0 && not p.folded then p :: player_in_pot t amount
+      else player_in_pot t amount
+
+let rec players_in_pots plist bet_list =
+  match bet_list with
+  | [] -> []
+  | h :: t ->
+      player_in_pot plist h :: players_in_pots (remove_pot_amount plist h) t
+
+let players_in_pot_list state =
+  players_in_pots state.players (bet_list state.players)
+
 let get_head = function
   | h :: t -> h
   | _ -> failwith "has no elements"
@@ -288,12 +304,42 @@ let get_tail = function
   | h :: t -> t
   | _ -> failwith "has no elements"
 
+let is_prev_sp state = if state.pot.side_pots = [] then false else true
+
+let rec add_to_tail list a =
+  match list with
+  | [] -> []
+  | h :: t ->
+      if add_to_tail t a = [] then (h + a) :: add_to_tail t a
+      else h :: add_to_tail t a
+
 let update_pot state =
-  if is_side_pot state.players then
+  if is_prev_sp state && is_side_pot state.players then
     let pot_list =
       pot_amounts state.players (fix_values (bet_list state.players))
     in
-    state.pot <- { amount = get_head pot_list; side_pots = get_tail pot_list }
+    state.pot <-
+      {
+        amount = state.pot.amount;
+        side_pots =
+          add_to_tail state.pot.side_pots (get_head pot_list)
+          @ get_tail pot_list;
+      }
+  else if is_prev_sp state && not (is_side_pot state.players) then
+    state.pot <-
+      {
+        amount = state.pot.amount;
+        side_pots = add_to_tail state.pot.side_pots state.pot.amount;
+      }
+  else if is_side_pot state.players then
+    let pot_list =
+      pot_amounts state.players (fix_values (bet_list state.players))
+    in
+    state.pot <-
+      {
+        amount = state.pot.amount + get_head pot_list;
+        side_pots = get_tail pot_list;
+      }
   else
     state.pot <-
       {
@@ -301,10 +347,17 @@ let update_pot state =
         side_pots = [];
       }
 
-(* let set_bet = () *)
+let update_money_help2 p int_list = p.money <- p.money + get_head int_list
 
-(*{ amount = main_pot_amount plist; side_pots = [] }*)
-(*testing*)
+let rec update_money_help1 int_list plist =
+  match plist with
+  | [] -> ()
+  | h :: t ->
+      update_money_help2 h int_list;
+      update_money_help1 (get_tail int_list) t
+
+let update_money status plist =
+  update_money_help1 (status.pot.amount :: status.pot.side_pots) plist
 
 let draw_card state =
   let x = List.hd state.deck in

@@ -35,8 +35,14 @@ val suit_arr : suit array
 val number_arr : number array
 (** [number_arr] are used in constructing new cards and pattern matching*)
 
+
+(** Given a suit, returns the suit of it in string form*)
+
 val ascii_suit : suit -> string
 (** Given a card, returns the suit of it in string form*)
+
+
+(** Given a card, returns the number of it as a string**)
 
 val str_number : number -> string
 (** Given a card, returns the numbe rof it as a string**)
@@ -66,8 +72,15 @@ module Hand : sig
       function we don't care about the suits of the cards*)
 
   val init_hand : card list -> t
+
   (** Takes a list of 5-7 cards as input, and returns a hand type of the best
       hand among those cards*)
+
+
+  (**Rank t gives the integer value of hand, worst low best high*)
+  val rank : t -> int
+  (** [compare h1 h2] returns -1 if h1 is a worse hand than h2, 0 if the hands are
+    equal (very rare) and 1 if h1 is a better hand than h2*)
 
   val compare : t -> t -> int
   (** [compare h1 h2] returns -1 if h1 is a worse hand than h2, 0 if the hands
