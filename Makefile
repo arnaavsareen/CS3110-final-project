@@ -18,8 +18,8 @@ play:
 	OCAMLRUNPARAM=b dune exec bin/main.exe
 
 zip:
-	rm -f finalproject.zip
-	zip -r finalproject.zip . -x@exclude.lst
+	rm -f 3110finalproject.zip
+	zip -r 3110finalproject.zip . -x@exclude.lst
 
 clean:
 	dune clean
